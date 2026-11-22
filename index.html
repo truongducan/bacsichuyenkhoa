@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BS Chuyên Khoa - Cổng Thông Tin Y Khoa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --brand-primary: #1d4ed8;
+            --brand-primary-dark: #1e3a8a;
+            --brand-soft: #eff6ff;
+        }
+        body.viewer-locked [data-admin-only] {
+            display: none !important;
+        }
+        .bg-brand-primary { background-color: var(--brand-primary) !important; }
+        .bg-brand-soft { background-color: var(--brand-soft) !important; }
+        .text-brand-primary { color: var(--brand-primary) !important; }
+        .border-brand-primary { border-color: var(--brand-primary) !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Định dạng nội dung bài đọc chi tiết */
+        .reader-body-prose {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            color: #1e293b;
+            line-height: 1.82;
+            text-align: justify;
+            overflow-wrap: break-word;
+            word-break: normal;
+        }
+        .reader-body-prose p {
+            margin-bottom: 1rem;
+        }
+        .reader-body-prose h2 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 1.5rem;
+            margin-bottom: 0.65rem;
+            text-align: left;
+            line-height: 1.38;
+        }
+    </style>
+</head>
+<body class="viewer-locked bg-white text-slate-900 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- ===================================================================== -->
+    <!-- 1. BANNER LỚN TRÊN CÙNG                                              -->
+    <!-- ===================================================================== -->
+    <section id="topLeaderboardBanner" class="w-full bg-gradient-to-r from-emerald-700 via-teal-600 to-green-700 text-white border-b border-slate-200 relative overflow-hidden">
+        <img id="topBannerImageEl" src="" alt="Banner đầu trang" class="w-full max-h-44 sm:max-h-52 object-cover hidden">
+
+        <div id="topBannerFallbackEl" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="text-center sm:text-left">
+                <span class="inline-block px-2 py-0.5 rounded bg-amber-300 text-slate-950 text-[10px] font-extrabold uppercase tracking-wide mb-1">
+                    Chuyên đề sức khỏe
+                </span>
+                <h2 id="topBannerTitleDisplay" class="font-display font-extrabold text-lg sm:text-2xl tracking-tight">
+                    DINH DƯỠNG &amp; CHĂM SÓC SỨC KHỎE CHUYÊN SÂU
+                </h2>
+                <p id="topBannerSubDisplay" class="text-xs sm:text-sm text-emerald-50 mt-0.5">
+                    Bấm nút "Giao diện" để tải ảnh banner riêng lên vị trí này
+                </p>
+            </div>
+            <button type="button" data-admin-only onclick="openThemeDrawer()" class="px-3.5 py-2 rounded-xl bg-white text-slate-900 hover:bg-emerald-50 text-xs font-bold shadow-xs shrink-0">
+                Đổi ảnh Banner
+            </button>
+        </div>
+
+        <button type="button" data-admin-only onclick="openThemeDrawer()" class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-slate-950/70 hover:bg-slate-950 text-white text-[11px] font-bold backdrop-blur-xs">
+            Sửa Banner
+        </button>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 2. THANH HEADER THƯƠNG HIỆU & CHUYÊN MỤC BÁO CHÍ Y KHOA              -->
+    <!-- ===================================================================== -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-3 border-b border-slate-100">
+            <a href="#" onclick="goHome(); return false;" class="flex items-center gap-2.5 shrink-0 group">
+                <div id="brandLogoContainer" class="w-9 h-9 rounded-xl bg-brand-primary text-white flex items-center justify-center shadow-sm overflow-hidden">
+                    <i data-lucide="stethoscope" id="brandDefaultIcon" class="w-5 h-5"></i>
+                    <img id="brandLogoImg" src="" alt="Logo" class="w-full h-full object-cover hidden">
+                </div>
+                <div>
+                    <span id="headerBrandName" class="font-display font-extrabold text-base sm:text-lg tracking-tight text-slate-950 block leading-none">BS Chuyên Khoa</span>
+                    <span id="headerBrandSub" class="text-[11px] font-medium text-slate-500 block mt-0.5">Cổng Thông Tin &amp; Tri Thức Y Khoa</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center flex-1 max-w-md mx-3">
+                <div class="relative w-full">
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    <input type="text" id="globalSearch" oninput="renderPortalHome()" placeholder="Tìm kiếm bài viết, đề mục, thẻ chức năng..." class="w-full pl-9 pr-4 py-1.5 bg-slate-100 focus:bg-white border border-transparent focus:border-brand-primary rounded-full text-xs font-medium text-slate-800 outline-none transition-all">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <span id="autoSaveText" data-admin-only class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    Đã lưu
+                </span>
+
+                <button type="button" data-admin-only onclick="openThemeDrawer()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors">
+                    <i data-lucide="palette" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    <span class="hidden sm:inline">Giao diện</span>
+                </button>
+
+                <button type="button" data-admin-only onclick="openCardModal()" class="px-3 py-1.5 bg-brand-primary hover:opacity-95 text-white rounded-full text-xs font-bold flex items-center gap-1 transition-opacity">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Tạo thẻ</span>
+                </button>
+
+                <button type="button" data-admin-only onclick="openArticleEditorModal()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-xs font-bold flex items-center gap-1 transition-colors">
+                    <i data-lucide="pen-square" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Đăng bài</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between gap-2">
+            <nav class="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar">
+                <button type="button" onclick="goHome()" class="p-1.5 rounded-lg text-slate-800 hover:bg-slate-100 hover:text-brand-primary transition-colors shrink-0" title="Trang chủ">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cat="all" onclick="setCategoryFilter('all')" class="nav-cat-btn px-2.5 py-1 rounded-lg text-[13px] font-bold text-brand-primary bg-brand-soft whitespace-nowrap transition-colors shrink-0">
+                    Tất cả
+                </button>
+                <button type="button" data-cat="event" onclick="setCategoryFilter('event')" class="nav-cat-btn px-2.5 py-1 rounded-lg text-[13px] font-semibold text-slate-700 hover:text-brand-primary hover:bg-slate-50 whitespace-nowrap transition-colors shrink-0">
+                    Thông báo &amp; Sự kiện
+                </button>
+                <button type="button" data-cat="forum" onclick="setCategoryFilter('forum')" class="nav-cat-btn px-2.5 py-1 rounded-lg text-[13px] font-semibold text-slate-700 hover:text-brand-primary hover:bg-slate-50 whitespace-nowrap transition-colors shrink-0">
+                    Thảo luận
+                </button>
+                <button type="button" data-cat="resource" onclick="setCategoryFilter('resource')" class="nav-cat-btn px-2.5 py-1 rounded-lg text-[13px] font-semibold text-slate-700 hover:text-brand-primary hover:bg-slate-50 whitespace-nowrap transition-colors shrink-0">
+                    Tài nguyên
+                </button>
+                <button type="button" data-cat="video" onclick="setCategoryFilter('video')" class="nav-cat-btn px-2.5 py-1 rounded-lg text-[13px] font-semibold text-slate-700 hover:text-brand-primary hover:bg-slate-50 whitespace-nowrap transition-colors shrink-0">
+                    Video
+                </button>
+                <button type="button" data-cat="legal" onclick="setCategoryFilter('legal')" class="nav-cat-btn px-2.5 py-1 rounded-lg text-[13px] font-semibold text-slate-700 hover:text-brand-primary hover:bg-slate-50 whitespace-nowrap transition-colors shrink-0">
+                    Pháp luật
+                </button>
+            </nav>
+
+            <div data-admin-only class="hidden sm:flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="exportBackupJson()" class="px-2 py-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md">
+                    Sao lưu JSON
+                </button>
+                <label class="px-2 py-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md cursor-pointer">
+                    Nạp JSON
+                    <input type="file" accept=".json,application/json" onchange="importBackupJson(event)" class="hidden">
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- 3. TRANG CHỦ BÁO CHÍ + CÁC THẺ CHỨC NĂNG                            -->
+    <!-- ===================================================================== -->
+    <main id="portalHomeView" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-8 border-b border-slate-200">
+            <div id="featuredHeroCol" class="lg:col-span-6"></div>
+            <div id="middleFeedCol" class="lg:col-span-3 lg:border-x lg:border-slate-200 lg:px-5 space-y-5"></div>
+            <aside class="lg:col-span-3 space-y-4">
+                <div onclick="handlePromoClick()" class="cursor-pointer rounded-xl overflow-hidden bg-gradient-to-r from-emerald-900 via-teal-800 to-cyan-800 text-white p-4 shadow-xs relative group">
+                    <img id="promoSideImg" src="" alt="Banner phụ" class="absolute inset-0 w-full h-full object-cover opacity-40 hidden">
+                    <div class="relative">
+                        <span class="text-[10px] uppercase tracking-wider text-amber-300 font-bold block">Chuyên mục tiêu điểm</span>
+                        <h3 id="promoSideTitle" class="font-display font-extrabold text-base mt-0.5 leading-snug group-hover:underline">
+                            Cập nhật hướng dẫn &amp; tài liệu y khoa
+                        </h3>
+                        <p class="text-[11px] text-teal-100 mt-1">Bấm để mở đọc trang tin chi tiết</p>
+                    </div>
+                </div>
+
+                <div class="rounded-xl overflow-hidden border border-slate-200 bg-slate-50 shadow-2xs">
+                    <div class="bg-brand-primary text-white px-4 py-2.5 flex items-center justify-between">
+                        <h2 id="spotlightBoxTitle" class="font-display font-extrabold text-xs sm:text-[13px] tracking-wide uppercase truncate">
+                            CHUYÊN MỤC NỔI BẬT
+                        </h2>
+                        <button type="button" data-admin-only onclick="openThemeDrawer()" class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded font-semibold shrink-0">
+                            Sửa tên
+                        </button>
+                    </div>
+                    <div id="spotlightCardsList" class="p-3 space-y-3"></div>
+                </div>
+            </aside>
+        </section>
+
+        <section class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 id="sectionCardsHeading" class="font-display font-extrabold text-lg sm:text-xl text-slate-950">
+                        Các Thẻ Chuyên Mục &amp; Chức Năng
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        Click vào từng thẻ để đọc trang tin chi tiết theo đề mục.
+                    </p>
+                </div>
+                <div data-admin-only class="flex items-center gap-2">
+                    <button type="button" onclick="openCardModal()" class="px-3 py-1.5 text-xs font-bold text-brand-primary bg-brand-soft hover:opacity-90 rounded-lg flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>Tạo thẻ mới</span>
+                    </button>
+                    <button type="button" onclick="resetDemoData()" class="px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg">
+                        Khôi phục mẫu
+                    </button>
+                </div>
+            </div>
+
+            <div id="functionalCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </section>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- 4. TRANG ĐỌC 1 BÀI CHI TIẾT TRONG TRANG TIN (CANH ĐỀU + TÙY CHỈNH)  -->
+    <!-- ===================================================================== -->
+    <section id="articleReaderView" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Thanh điều hướng & thao tác bài -->
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 pb-4 mb-5 border-b border-slate-200">
+            <div class="flex items-center gap-2 flex-wrap">
+                <button type="button" onclick="goHome()" class="font-bold text-brand-primary hover:underline flex items-center gap-1">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                    <span>Trang chủ</span>
+                </button>
+                <span class="text-slate-400">&gt;</span>
+                <button type="button" id="readerParentCardBtn" class="font-bold text-slate-800 hover:text-brand-primary">Chuyên mục</button>
+                <span class="text-slate-400">&gt;</span>
+                <span id="readerTopicBreadcrumb" class="text-slate-500 font-medium">Đề mục</span>
+            </div>
+
+            <div data-admin-only class="flex items-center gap-2 flex-wrap">
+                <button type="button" onclick="toggleReaderFormatBar()" class="px-3 py-1.5 bg-brand-soft hover:opacity-90 text-brand-primary border border-blue-200 rounded-lg text-xs font-bold flex items-center gap-1">
+                    <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+                    <span>Định dạng chữ bài</span>
+                </button>
+                <button type="button" onclick="editCardById(currentCardContextId)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold flex items-center gap-1">
+                    <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
+                    <span>Sửa thẻ</span>
+                </button>
+                <button type="button" onclick="editCurrentReaderArticle()" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold flex items-center gap-1">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                    <span>Sửa bài này</span>
+                </button>
+                <button type="button" onclick="deleteCurrentReaderArticle()" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-bold">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+                <button type="button" onclick="openArticleEditorModal(currentCardContextId)" class="px-3 py-1.5 bg-brand-primary hover:opacity-95 text-white rounded-lg text-xs font-bold flex items-center gap-1">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Thêm bài</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Thanh thiết lập Căn lề, Font, Cỡ chữ, Màu chữ riêng cho bài đang đọc -->
+        <div id="readerFormatBar" data-admin-only class="hidden mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs space-y-3">
+            <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                    <i data-lucide="type" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    Tùy chỉnh chữ nội dung bài viết này
+                </span>
+                <button type="button" onclick="resetCurrentArticleStyle()" class="text-[11px] font-bold text-slate-500 hover:text-slate-900 underline">
+                    Khôi phục chuẩn bài
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
+                <!-- Căn lề -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Căn lề đoạn văn</label>
+                    <div class="grid grid-cols-4 gap-1 bg-white p-1 rounded-xl border border-slate-200">
+                        <button type="button" data-align="justify" onclick="updateCurrentArticleStyle({ align: 'justify' })" class="reader-align-btn py-1.5 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100" title="Canh đều">
+                            <i data-lucide="align-justify" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button type="button" data-align="left" onclick="updateCurrentArticleStyle({ align: 'left' })" class="reader-align-btn py-1.5 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100" title="Canh trái">
+                            <i data-lucide="align-left" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button type="button" data-align="center" onclick="updateCurrentArticleStyle({ align: 'center' })" class="reader-align-btn py-1.5 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100" title="Canh giữa">
+                            <i data-lucide="align-center" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button type="button" data-align="right" onclick="updateCurrentArticleStyle({ align: 'right' })" class="reader-align-btn py-1.5 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100" title="Canh phải">
+                            <i data-lucide="align-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Font chữ -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Font chữ nội dung</label>
+                    <select id="readerFontSelect" onchange="updateCurrentArticleStyle({ fontFamily: this.value })" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-brand-primary">
+                        <option value="'Inter', sans-serif">Inter (Hiện đại, rõ nét)</option>
+                        <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Báo chí)</option>
+                        <option value="Georgia, 'Times New Roman', serif">Georgia (Có chân, dễ đọc dài)</option>
+                        <option value="'Times New Roman', Times, serif">Times New Roman (Văn bản)</option>
+                    </select>
+                </div>
+
+                <!-- Size chữ -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Cỡ chữ (Size)</label>
+                    <select id="readerSizeSelect" onchange="updateCurrentArticleStyle({ fontSize: Number(this.value) })" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-brand-primary">
+                        <option value="14">14px — Nhỏ gọn</option>
+                        <option value="16">16px — Chuẩn trang tin</option>
+                        <option value="18">18px — Thoải mái</option>
+                        <option value="20">20px — Cỡ lớn</option>
+                    </select>
+                </div>
+
+                <!-- Màu sắc chữ -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Màu sắc chữ nội dung</label>
+                    <div class="flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-slate-200">
+                        <button type="button" onclick="updateCurrentArticleStyle({ textColor: '#1e293b' })" class="w-5 h-5 rounded-full bg-slate-800 border border-white shadow-2xs" title="Xám than"></button>
+                        <button type="button" onclick="updateCurrentArticleStyle({ textColor: '#0f172a' })" class="w-5 h-5 rounded-full bg-slate-950 border border-white shadow-2xs" title="Đen đậm"></button>
+                        <button type="button" onclick="updateCurrentArticleStyle({ textColor: '#1e3a8a' })" class="w-5 h-5 rounded-full bg-blue-900 border border-white shadow-2xs" title="Xanh navy"></button>
+                        <button type="button" onclick="updateCurrentArticleStyle({ textColor: '#065f46' })" class="w-5 h-5 rounded-full bg-emerald-900 border border-white shadow-2xs" title="Xanh rêu"></button>
+                        <input type="color" id="readerColorPicker" oninput="updateCurrentArticleStyle({ textColor: this.value })" class="w-6 h-6 rounded cursor-pointer border-0 bg-transparent ml-auto" title="Chọn màu khác">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khung đọc 1 bài chi tiết trang nhã, cân đối -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <article class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-8 shadow-2xs space-y-5">
+                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                    <span id="readerTopicBadge" class="px-2.5 py-0.5 rounded-full bg-brand-soft text-brand-primary font-bold"></span>
+                    <span id="readerDate" class="font-medium"></span>
+                    <span>•</span>
+                    <span id="readerAuthor" class="font-semibold text-slate-700"></span>
+                </div>
+
+                <h1 id="readerTitle" class="font-display font-extrabold text-2xl sm:text-[30px] lg:text-[34px] text-slate-950 leading-[1.24] tracking-tight text-left"></h1>
+
+                <p id="readerSapo" class="font-semibold text-base sm:text-[17px] text-slate-800 leading-relaxed text-justify pb-4 border-b border-slate-100"></p>
+
+                <div id="readerMediaBox" class="hidden rounded-xl overflow-hidden border border-slate-200 bg-slate-950 relative"></div>
+
+                <!-- Phần nội dung chính áp dụng căn lề, font, size, màu chữ riêng của bài -->
+                <div id="readerSectionsBox" class="reader-body-prose"></div>
+
+                <div id="readerLinkBox" class="hidden pt-2"></div>
+                <div id="readerAttachmentBox" class="hidden pt-2"></div>
+            </article>
+
+            <aside class="lg:col-span-4 space-y-4 lg:sticky lg:top-28">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                        <h3 id="readerCardTitleSide" class="font-display font-extrabold text-sm text-slate-900"></h3>
+                        <button type="button" data-admin-only onclick="openArticleEditorModal(currentCardContextId)" class="text-[11px] font-bold text-brand-primary hover:underline">+ Thêm mục</button>
+                    </div>
+                    <div id="readerSiblingArticles" class="space-y-2"></div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- FOOTER CUỐI TRANG                                                     -->
+    <!-- ===================================================================== -->
+    <footer class="bg-slate-50 border-t border-slate-200 py-5 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+            <div><strong id="footerBrandName" class="text-slate-800">BS Chuyên Khoa</strong> — <span id="footerTagline">Cổng Thông Tin &amp; Chia Sẻ Tri Thức Y Khoa</span></div>
+
+            <div class="flex items-center gap-2 ml-auto">
+                <button type="button" data-admin-only onclick="openChangePassModal()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold flex items-center gap-1.5 shadow-2xs transition-colors">
+                    <i data-lucide="key-round" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    <span>Đổi mật khẩu</span>
+                </button>
+
+                <button type="button" id="footerAdminCardBtn" onclick="handleAdminToggleClick()" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-800 font-bold flex items-center gap-1.5 shadow-2xs transition-colors">
+                    <i data-lucide="lock" id="adminLockIcon" class="w-3.5 h-3.5 text-slate-500"></i>
+                    <span id="adminLockLabel">Quản trị</span>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL NHẬP MẬT KHẨU ADMIN & ĐỔI MẬT KHẨU                            -->
+    <!-- ===================================================================== -->
+    <div id="adminPassModal" class="fixed inset-0 bg-slate-950/65 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="key-round" class="w-4 h-4 text-brand-primary"></i>
+                    <h3 class="font-display font-bold text-sm text-slate-900">Xác thực Quản trị Admin</h3>
+                </div>
+                <button type="button" onclick="closeAdminPassModal()" class="p-1 rounded-lg text-slate-400 hover:bg-slate-100"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <form onsubmit="verifyAdminPass(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nhập mật khẩu quản trị</label>
+                    <input type="password" id="adminPassInput" required autofocus placeholder="••••••" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-brand-primary">
+                    <p id="adminPassError" class="text-[11px] font-semibold text-rose-600 mt-1 hidden">Mật khẩu không đúng. Vui lòng thử lại.</p>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-1">
+                    <button type="button" onclick="closeAdminPassModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl">Vào quản trị</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="changePassModal" class="fixed inset-0 bg-slate-950/65 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="key-round" class="w-4 h-4 text-brand-primary"></i>
+                    <h3 class="font-display font-bold text-sm text-slate-900">Thiết lập Đổi mật khẩu Admin</h3>
+                </div>
+                <button type="button" onclick="closeChangePassModal()" class="p-1 rounded-lg text-slate-400 hover:bg-slate-100"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <form onsubmit="handleChangeAdminPass(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu hiện tại *</label>
+                    <input type="password" id="currentPassInput" required placeholder="Nhập mật khẩu hiện tại" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu mới *</label>
+                    <input type="password" id="newPassInput" required minlength="4" placeholder="Nhập mật khẩu mới (tối thiểu 4 ký tự)" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Xác nhận mật khẩu mới *</label>
+                    <input type="password" id="confirmNewPassInput" required placeholder="Nhập lại mật khẩu mới" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-primary">
+                </div>
+                <p id="changePassMsg" class="text-[11px] font-semibold text-rose-600 hidden"></p>
+                <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="resetDefaultPasscode()" class="px-2.5 py-1.5 text-[11px] font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        Về mặc định (123456)
+                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="closeChangePassModal()" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Hủy</button>
+                        <button type="submit" class="px-4 py-1.5 bg-brand-primary text-white text-xs font-bold rounded-xl">Lưu mật khẩu</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL TẠO / SỬA THẺ CHỨC NĂNG -->
+    <div id="cardFormModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full max-h-[92vh] overflow-y-auto p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 id="cardModalHeading" class="font-display font-bold text-base text-slate-900">Tạo thẻ chức năng mới</h3>
+                <button type="button" onclick="closeCardModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <form id="cardConfigForm" onsubmit="handleSaveCard(event)" class="space-y-3.5">
+                <input type="hidden" id="editCardId">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Tên thẻ chức năng *</label>
+                    <input type="text" id="cardTitleInput" required placeholder="VD: Thông báo chung" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-brand-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Mô tả ngắn gọn *</label>
+                    <input type="text" id="cardDescInput" required placeholder="VD: Các đề mục thông báo và đường link hữu ích" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-brand-primary">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Chuyên mục</label>
+                        <select id="cardCatInput" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white outline-none">
+                            <option value="event">Thông báo &amp; Sự kiện</option>
+                            <option value="forum">Thảo luận</option>
+                            <option value="resource">Tài nguyên</option>
+                            <option value="video">Video</option>
+                            <option value="legal">Pháp luật</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Biểu tượng</label>
+                        <select id="cardIconInput" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white outline-none">
+                            <option value="megaphone">Loa thông báo</option>
+                            <option value="message-square">Hội thoại</option>
+                            <option value="folder-heart">Tài nguyên</option>
+                            <option value="calendar">Lịch sự kiện</option>
+                            <option value="video">Video</option>
+                            <option value="scale">Pháp luật</option>
+                            <option value="stethoscope">Y khoa</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Ảnh bìa thẻ (tải ảnh hoặc dán URL)</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="cardCoverUrlInput" placeholder="https://..." class="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                        <label class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold cursor-pointer shrink-0">
+                            Tải ảnh
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, 'cardCoverUrlInput')" class="hidden">
+                        </label>
+                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeCardModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Hủy</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl">Lưu thẻ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL ĐĂNG / SỬA BÀI VIẾT (CÓ ĐỊNH DẠNG CĂN LỀ, FONT, SIZE, MÀU CHỮ) -->
+    <div id="articleEditorModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 id="articleModalHeading" class="font-display font-bold text-base text-slate-900">Đăng / Chỉnh sửa trang tin</h3>
+                <button type="button" onclick="closeArticleEditorModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <form id="articleForm" onsubmit="handleSaveArticle(event)" class="space-y-3.5">
+                <input type="hidden" id="editArticleId">
+                <input type="hidden" id="articleFileDataUrl">
+                <input type="hidden" id="articleFileMime">
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Thuộc thẻ chức năng *</label>
+                        <select id="articleCardSelect" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Đề mục *</label>
+                        <input type="text" id="articleTopicInput" required placeholder="VD: Thông báo chung" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Tác giả</label>
+                        <input type="text" id="articleAuthorInput" placeholder="BS Chuyên Khoa" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Tiêu đề bài viết *</label>
+                    <input type="text" id="articleTitleInput" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm font-semibold outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Đoạn mở đầu (Sapo) *</label>
+                    <textarea id="articleSapoInput" rows="2" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs outline-none"></textarea>
+                </div>
+
+                <!-- Thiết lập Căn lề, Font, Size, Màu chữ cho nội dung bài -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+                    <span class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-700">Định dạng chữ nội dung bài</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Căn lề</label>
+                            <select id="articleAlignInput" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
+                                <option value="justify">Canh đều</option>
+                                <option value="left">Canh trái</option>
+                                <option value="center">Canh giữa</option>
+                                <option value="right">Canh phải</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Font chữ</label>
+                            <select id="articleFontInput" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
+                                <option value="'Inter', sans-serif">Inter</option>
+                                <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
+                                <option value="Georgia, 'Times New Roman', serif">Georgia</option>
+                                <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Size chữ</label>
+                            <select id="articleSizeInput" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none">
+                                <option value="14">14px</option>
+                                <option value="16" selected>16px</option>
+                                <option value="18">18px</option>
+                                <option value="20">20px</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Màu chữ</label>
+                            <div class="flex items-center gap-2 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                                <input type="color" id="articleColorInput" value="#1e293b" class="w-6 h-6 rounded cursor-pointer border-0 bg-transparent">
+                                <span class="text-[11px] text-slate-600 font-medium">Màu nội dung</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nội dung chi tiết (Dùng "## Tên tiểu mục" để tạo đề mục con) *</label>
+                    <textarea id="articleBodyInput" rows="5" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs outline-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-blue-50/60 rounded-xl border border-blue-100">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Tên hiển thị đường link</label>
+                        <input type="text" id="articleLinkLabelInput" placeholder="VD: Xem tài liệu" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Đường link (URL hoặc YouTube)</label>
+                        <input type="text" id="articleLinkUrlInput" placeholder="https://..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ảnh minh họa</label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" id="articleImageInput" placeholder="URL ảnh hoặc tải ảnh..." class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none">
+                            <label class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold cursor-pointer shrink-0">
+                                Ảnh
+                                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'articleImageInput')" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">File PDF / Video đính kèm</label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" id="articleFileNameInput" placeholder="Tên file hoặc chọn file..." class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none">
+                            <label class="px-2.5 py-2 bg-brand-primary text-white rounded-xl text-xs font-bold cursor-pointer shrink-0">
+                                File
+                                <input type="file" onchange="handleArticleFileSelect(event)" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeArticleEditorModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Hủy</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl">Lưu &amp; Đăng bài</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DRAWER TÙY CHỈNH GIAO DIỆN -->
+    <div id="themeDrawerOverlay" onclick="closeThemeDrawer()" class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-40 hidden"></div>
+    <aside id="themeDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="px-6 py-4 bg-brand-primary text-white flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-2">
+                <i data-lucide="palette" class="w-5 h-5"></i>
+                <h3 class="font-display font-bold text-base">Tùy Chỉnh Giao Diện &amp; Lưu</h3>
+            </div>
+            <button type="button" onclick="closeThemeDrawer()" class="p-1.5 rounded-lg bg-white/15 hover:bg-white/25"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1 space-y-6">
+            <div class="space-y-2.5 p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-emerald-900">1. Hình Banner Lớn Trên Cùng</h4>
+                    <button type="button" onclick="document.getElementById('cfgTopBannerImg').value=''; saveAndApplyUiConfig();" class="text-[11px] font-bold text-rose-600 hover:underline">Xóa ảnh</button>
+                </div>
+                <p class="text-[11px] text-slate-600">Tải ảnh banner ngang từ máy tính hoặc dán link ảnh để hiển thị ở dải trên cùng.</p>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="cfgTopBannerImg" oninput="saveAndApplyUiConfig()" placeholder="Dán link ảnh banner hoặc bấm Tải ảnh..." class="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none">
+                    <label class="px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl cursor-pointer shrink-0">
+                        Tải ảnh
+                        <input type="file" accept="image/*" onchange="handleImageUpload(event, 'cfgTopBannerImg', saveAndApplyUiConfig)" class="hidden">
+                    </label>
+                </div>
+                <input type="text" id="cfgTopBannerTitle" oninput="saveAndApplyUiConfig()" placeholder="Tiêu đề banner khi chưa có ảnh" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs">
+                <input type="text" id="cfgTopBannerSub" oninput="saveAndApplyUiConfig()" placeholder="Mô tả ngắn banner khi chưa có ảnh" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs">
+            </div>
+
+            <div class="space-y-2.5">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-primary">2. Màu sắc chủ đạo</h4>
+                <div class="grid grid-cols-4 gap-2">
+                    <button type="button" onclick="selectColorPreset('#1d4ed8', '#1e3a8a', '#eff6ff')" class="p-2 rounded-xl border border-slate-200 hover:border-blue-600 text-center">
+                        <span class="w-6 h-6 rounded-full bg-blue-700 mx-auto block mb-1"></span>
+                        <span class="text-[11px] font-semibold">Xanh Báo</span>
+                    </button>
+                    <button type="button" onclick="selectColorPreset('#0284c7', '#0c4a6e', '#f0f9ff')" class="p-2 rounded-xl border border-slate-200 hover:border-sky-600 text-center">
+                        <span class="w-6 h-6 rounded-full bg-sky-600 mx-auto block mb-1"></span>
+                        <span class="text-[11px] font-semibold">Đại Dương</span>
+                    </button>
+                    <button type="button" onclick="selectColorPreset('#0d9488', '#115e59', '#f0fdfa')" class="p-2 rounded-xl border border-slate-200 hover:border-teal-600 text-center">
+                        <span class="w-6 h-6 rounded-full bg-teal-600 mx-auto block mb-1"></span>
+                        <span class="text-[11px] font-semibold">Xanh Y Tế</span>
+                    </button>
+                    <button type="button" onclick="selectColorPreset('#4338ca', '#1e1b4b', '#eef2ff')" class="p-2 rounded-xl border border-slate-200 hover:border-indigo-600 text-center">
+                        <span class="w-6 h-6 rounded-full bg-indigo-700 mx-auto block mb-1"></span>
+                        <span class="text-[11px] font-semibold">Hoàng Gia</span>
+                    </button>
+                </div>
+                <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                    <span class="text-xs font-semibold text-slate-700">Mã màu tùy chỉnh:</span>
+                    <input type="color" id="cfgPrimaryColor" oninput="saveAndApplyUiConfig()" class="w-9 h-7 rounded cursor-pointer border-0 bg-transparent">
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-4 border-t border-slate-100">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-primary">3. Logo &amp; Tên Cổng Thông Tin</h4>
+                <input type="text" id="cfgBrandName" oninput="saveAndApplyUiConfig()" placeholder="Tên trang web" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                <input type="text" id="cfgBrandSub" oninput="saveAndApplyUiConfig()" placeholder="Dòng mô tả nhỏ" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                <div class="flex items-center gap-2">
+                    <input type="text" id="cfgLogoImgUrl" oninput="saveAndApplyUiConfig()" placeholder="URL ảnh logo hoặc tải logo..." class="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                    <label class="px-3 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl cursor-pointer shrink-0">
+                        Logo
+                        <input type="file" accept="image/*" onchange="handleImageUpload(event, 'cfgLogoImgUrl', saveAndApplyUiConfig)" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-4 border-t border-slate-100">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-primary">4. Tiêu đề khối &amp; Số cột thẻ</h4>
+                <input type="text" id="cfgSpotlightTitle" oninput="saveAndApplyUiConfig()" placeholder="Tiêu đề hộp xanh cột phải" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                <input type="text" id="cfgPromoTitle" oninput="saveAndApplyUiConfig()" placeholder="Tiêu đề banner điểm nhấn cột phải" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                <input type="text" id="cfgSectionHeading" oninput="saveAndApplyUiConfig()" placeholder="Tiêu đề khu vực lưới thẻ" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                <select id="cfgGridCols" onchange="saveAndApplyUiConfig()" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white outline-none">
+                    <option value="2">2 cột thẻ chức năng</option>
+                    <option value="3">3 cột thẻ chức năng</option>
+                    <option value="4">4 cột thẻ chức năng</option>
+                </select>
+            </div>
+
+            <div class="space-y-2.5 pt-4 border-t border-slate-100">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-primary">5. Bảo mật &amp; Mật khẩu Admin</h4>
+                <p class="text-[11px] text-slate-600">Đổi mật khẩu đăng nhập thẻ Quản trị ở cuối trang (mặc định ban đầu: <strong>123456</strong>).</p>
+                <button type="button" onclick="closeThemeDrawer(); openChangePassModal();" class="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5">
+                    <i data-lucide="key-round" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    <span>Đổi mật khẩu Quản trị</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-2 shrink-0">
+            <button type="button" onclick="resetUiConfig()" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/70 rounded-xl">Mặc định</button>
+            <button type="button" onclick="saveAndApplyUiConfig(); closeThemeDrawer(); showToast('Đã lưu giao diện thành công!');" class="px-5 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl">Lưu giao diện</button>
+        </div>
+    </aside>
+
+    <!-- MODAL XEM FILE -->
+    <div id="fileViewerModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-5">
+        <div class="bg-white rounded-2xl max-w-5xl w-full h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-4 py-3 bg-slate-900 text-white flex items-center justify-between gap-2 shrink-0">
+                <h3 id="viewerFileTitle" class="font-display font-bold text-sm truncate">Tài liệu đính kèm</h3>
+                <div class="flex items-center gap-2 shrink-0">
+                    <a id="viewerDownloadLink" href="#" download="tai-lieu" class="px-3 py-1.5 bg-sky-500 text-slate-950 text-xs font-bold rounded-lg">Tải về</a>
+                    <button type="button" onclick="closeFileViewerModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-rose-600 text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+            <div id="fileViewerBody" class="flex-1 bg-slate-200 overflow-auto flex flex-col items-center p-4"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span id="toastText">Đã lưu!</span>
+    </div>
+
+    <script>
+        const DEFAULT_PASSCODE = '123456';
+        const DEFAULT_ARTICLE_STYLE = {
+            align: 'justify',
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 16,
+            textColor: '#1e293b'
+        };
+
+        const ministryTreatmentGuideline = {
+            id: 802,
+            topic: 'Hướng dẫn điều trị',
+            title: 'Hướng dẫn chẩn đoán và điều trị đái tháo đường típ 2 – Bộ Y tế',
+            sapo: 'Tài liệu chuyên môn của Bộ Y tế ban hành kèm theo Quyết định số 5481/QĐ-BYT năm 2020 (bản PDF gồm 77 trang).',
+            body: '## Nội dung trọng tâm\nTài liệu cập nhật tiêu chuẩn chẩn đoán, mục tiêu kiểm soát đường huyết, lựa chọn thuốc điều trị và theo dõi biến chứng đái tháo đường típ 2.\n\n## Tra cứu tài liệu\nBấm xem tài liệu PDF hoặc mở đường link trực tiếp bên dưới.',
+            author: 'Bộ Y tế',
+            date: '22-11-2026',
+            imageUrl: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=80',
+            linkLabel: 'Mở tài liệu Quyết định 5481/QĐ-BYT',
+            linkUrl: 'https://bschuyenkhoa.netlify.app/assets/documents/quyet-dinh-5481-qd-byt-huong-dan-chan-doan-va-dieu-tri-dai-thao-duong-tip-2.pdf',
+            fileName: 'Quyet_dinh_5481_QD_BYT_Huong_dan_dieu_tri_dai_thao_duong_tip-2.pdf',
+            fileDataUrl: 'https://bschuyenkhoa.netlify.app/assets/documents/quyet-dinh-5481-qd-byt-huong-dan-chan-doan-va-dieu-tri-dai_thao_duong_tip-2.pdf',
+            fileMime: 'application/pdf',
+            style: { ...DEFAULT_ARTICLE_STYLE }
+        };
+
+        const electronicMedicalRecordsCircular = {
+            id: 803,
+            topic: 'Văn bản pháp luật',
+            title: 'Thông tư 13/2025/TT-BYT – Hướng dẫn triển khai hồ sơ bệnh án điện tử',
+            sapo: 'Thông tư số 13/2025/TT-BYT do Bộ Y tế ban hành ngày 06/06/2025, hướng dẫn triển khai hồ sơ bệnh án điện tử.',
+            body: '## Quy định triển khai\nVăn bản quy định yêu cầu kỹ thuật, quy trình quản lý, lưu trữ và liên thông dữ liệu hồ sơ bệnh án điện tử tại các cơ sở khám chữa bệnh.',
+            author: 'Bộ Y tế',
+            date: '22-11-2026',
+            imageUrl: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1000&q=80',
+            linkLabel: 'Xem văn bản Thông tư 13/2025/TT-BYT',
+            linkUrl: 'https://bschuyenkhoa.netlify.app/assets/documents/thong-tu-13-2025-tt-byt-huong-dan-trien-khai-ho-so-benh-an-dien-tu.pdf',
+            fileName: 'Thong_tu_13_2025_TT_BYT_Ho_so_benh_an_dien_tu.pdf',
+            fileDataUrl: 'https://bschuyenkhoa.netlify.app/assets/documents/thong-tu-13-2025-tt-byt-huong-dan-trien-khai-ho-so-benh-an_dien_tu.pdf',
+            fileMime: 'application/pdf',
+            style: { ...DEFAULT_ARTICLE_STYLE }
+        };
+
+        const defaultCards = [
+            {
+                id: 'card-1',
+                title: 'Bảng Tin Thông Báo Chung',
+                description: 'Các đề mục thông báo nổi bật, lịch sinh hoạt và đường link cập nhật nhanh.',
+                category: 'event',
+                icon: 'megaphone',
+                coverImage: '',
+                items: [
+                    {
+                        id: 101,
+                        topic: 'Thông báo nổi bật',
+                        title: 'Chính phủ đặt mục tiêu đến năm 2030 đạt 19 bác sĩ trên 1 vạn dân',
+                        sapo: 'Chương trình hành động đặt ra nhiều mục tiêu trọng tâm về y tế, dân số và phát triển nguồn nhân lực.',
+                        body: '## Hướng tới y tế công bằng, chất lượng\nTăng cường đào tạo nhân lực y tế chuyên sâu, nâng cao chất lượng khám chữa bệnh tuyến cơ sở và đẩy mạnh chuyển đổi số ngành y tế.\n\n## Kết nối & Tra cứu thêm\nBấm đường link bên dưới để mở trang thông tin liên quan.',
+                        author: 'BS Chuyên Khoa',
+                        date: '22-11-2026',
+                        imageUrl: 'https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=1200&q=80',
+                        linkLabel: 'Mở đường link thông tin tham khảo',
+                        linkUrl: 'https://bschuyenkhoa.netlify.app/',
+                        fileName: '',
+                        fileDataUrl: '',
+                        fileMime: '',
+                        style: { ...DEFAULT_ARTICLE_STYLE }
+                    },
+                    {
+                        id: 102,
+                        topic: 'Đường link & Sinh hoạt',
+                        title: 'Lịch sinh hoạt chuyên môn định kỳ & Phòng họp trực tuyến',
+                        sapo: 'Cập nhật lịch họp chuyên môn, trao đổi ca lâm sàng và đường link tham gia trực tuyến.',
+                        body: '## Thời gian & Hình thức\nCác buổi sinh hoạt chuyên môn được cập nhật thường xuyên kèm đường link truy cập nhanh.',
+                        author: 'Ban Điều Hành',
+                        date: '22-11-2026',
+                        imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80',
+                        linkLabel: 'Truy cập đường link sinh hoạt',
+                        linkUrl: 'https://bschuyenkhoa.netlify.app/',
+                        fileName: '',
+                        fileDataUrl: '',
+                        fileMime: '',
+                        style: { ...DEFAULT_ARTICLE_STYLE }
+                    }
+                ]
+            },
+            {
+                id: 'card-2',
+                title: 'Diễn Đàn Thảo Luận & Hỏi Đáp',
+                description: 'Trao đổi kinh nghiệm chuyên môn, đặt câu hỏi và chia sẻ đường link thảo luận theo đề mục.',
+                category: 'forum',
+                icon: 'message-square',
+                coverImage: '',
+                items: [
+                    {
+                        id: 201,
+                        topic: 'Kinh nghiệm lâm sàng',
+                        title: 'Tối ưu quy trình quản lý ngoại trú bệnh mạn tính',
+                        sapo: 'Chia sẻ giải pháp cải thiện tuân thủ điều trị và hẹn tái khám đúng lịch cho người bệnh.',
+                        body: '## Thảo luận thực tế\nTư vấn ngắn gọn, dễ hiểu tại phòng khám giúp người bệnh duy trì mục tiêu điều trị lâu dài.',
+                        author: 'BS Chuyên Khoa',
+                        date: '21-11-2026',
+                        imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=900&q=80',
+                        linkLabel: '',
+                        linkUrl: '',
+                        fileName: '',
+                        fileDataUrl: '',
+                        fileMime: '',
+                        style: { ...DEFAULT_ARTICLE_STYLE }
+                    }
+                ]
+            },
+            {
+                id: 'card-3',
+                title: 'Kho Tài Nguyên & Biểu Mẫu',
+                description: 'Tổng hợp tài liệu, biểu mẫu và đường link tài nguyên tham khảo.',
+                category: 'resource',
+                icon: 'folder-heart',
+                coverImage: '',
+                items: [
+                    {
+                        id: 301,
+                        topic: 'Biểu mẫu & Hướng dẫn',
+                        title: 'Bộ tài liệu hướng dẫn và biểu mẫu chuyên môn',
+                        sapo: 'Tổng hợp các biểu mẫu và tài liệu hỗ trợ công tác chuyên môn và quản lý.',
+                        body: '## Cách sử dụng\nChọn bài viết để đọc chi tiết, mở đường link hoặc xem file đính kèm trực tiếp.',
+                        author: 'Quản trị viên',
+                        date: '20-11-2026',
+                        imageUrl: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=900&q=80',
+                        linkLabel: '',
+                        linkUrl: '',
+                        fileName: '',
+                        fileDataUrl: '',
+                        fileMime: '',
+                        style: { ...DEFAULT_ARTICLE_STYLE }
+                    }
+                ]
+            },
+            {
+                id: 'card-4',
+                title: 'Kho Tài Liệu Pháp Luật',
+                description: 'Tổng hợp thông tư, quyết định và văn bản quy định ngành y.',
+                category: 'legal',
+                icon: 'scale',
+                coverImage: '',
+                items: [
+                    { ...ministryTreatmentGuideline },
+                    { ...electronicMedicalRecordsCircular }
+                ]
+            }
+        ];
+
+        const defaultUiConfig = {
+            primaryColor: '#1d4ed8',
+            primaryDark: '#1e3a8a',
+            softColor: '#eff6ff',
+            brandName: 'BS Chuyên Khoa',
+            brandSub: 'Cổng Thông Tin & Tri Thức Y Khoa',
+            logoImgUrl: '',
+            topBannerImg: '',
+            topBannerTitle: 'DINH DƯỠNG & CHĂM SÓC SỨC KHỎE CHUYÊN SÂU',
+            topBannerSub: 'Bấm nút "Giao diện" để tải ảnh banner riêng lên vị trí này',
+            spotlightTitle: 'CHUYÊN MỤC NỔI BẬT',
+            promoTitle: 'Cập nhật hướng dẫn & tài liệu y khoa',
+            promoImg: '',
+            sectionHeading: 'Các Thẻ Chuyên Mục & Chức Năng',
+            gridCols: '3'
+        };
+
+        const DB_NAME = 'BlueHubFixedDB';
+        const DB_STORE = 'stateStore';
+        const DB_KEY_CARDS = 'cards_data_v2';
+        const DB_KEY_UI = 'ui_config_v2';
+        const DB_KEY_PASS = 'admin_passcode_v1';
+
+        let uiConfig = { ...defaultUiConfig, ...(JSON.parse(localStorage.getItem('bluehub_ui_v2')) || {}) };
+        let communityCards = JSON.parse(localStorage.getItem('bluehub_cards_v2')) || JSON.parse(JSON.stringify(defaultCards));
+        let adminPasscode = localStorage.getItem('bluehub_admin_pass') || DEFAULT_PASSCODE;
+        let isAdminMode = sessionStorage.getItem('bluehub_admin_unlocked') === 'true';
+        let activeCategory = 'all';
+        let currentCardContextId = null;
+        let currentArticleContextId = null;
+
+        function normalizeArticleStyle(style) {
+            return { ...DEFAULT_ARTICLE_STYLE, ...(style && typeof style === 'object' ? style : {}) };
+        }
+
+        function applyReaderBodyStyle(styleObj) {
+            const st = normalizeArticleStyle(styleObj);
+            const box = document.getElementById('readerSectionsBox');
+            if (!box) return;
+            box.style.fontFamily = st.fontFamily;
+            box.style.fontSize = `${st.fontSize}px`;
+            box.style.color = st.textColor;
+            box.style.textAlign = st.align;
+
+            // Đồng bộ các điều khiển trên thanh định dạng
+            const fontSel = document.getElementById('readerFontSelect');
+            const sizeSel = document.getElementById('readerSizeSelect');
+            const colorPicker = document.getElementById('readerColorPicker');
+            if (fontSel) fontSel.value = st.fontFamily;
+            if (sizeSel) sizeSel.value = String(st.fontSize);
+            if (colorPicker) colorPicker.value = /^#[0-9a-fA-F]{6}$/.test(st.textColor) ? st.textColor : '#1e293b';
+
+            document.querySelectorAll('.reader-align-btn').forEach(btn => {
+                if (btn.dataset.align === st.align) {
+                    btn.className = 'reader-align-btn py-1.5 rounded-lg flex items-center justify-center bg-brand-primary text-white shadow-2xs';
+                } else {
+                    btn.className = 'reader-align-btn py-1.5 rounded-lg flex items-center justify-center text-slate-700 hover:bg-slate-100';
+                }
+            });
+        }
+
+        function toggleReaderFormatBar() {
+            if (!isAdminMode) return openAdminPassModal();
+            const bar = document.getElementById('readerFormatBar');
+            if (bar) bar.classList.toggle('hidden');
+            lucide.createIcons();
+        }
+
+        async function updateCurrentArticleStyle(patch) {
+            if (!isAdminMode) return openAdminPassModal();
+            if (!currentCardContextId || !currentArticleContextId) return;
+            const card = communityCards.find(c => c.id === currentCardContextId);
+            const art = (card && card.items || []).find(i => i.id === currentArticleContextId);
+            if (!art) return;
+
+            art.style = normalizeArticleStyle({ ...art.style, ...patch });
+            applyReaderBodyStyle(art.style);
+            await saveCardsAuto();
+        }
+
+        async function resetCurrentArticleStyle() {
+            await updateCurrentArticleStyle({ ...DEFAULT_ARTICLE_STYLE });
+            showToast('Đã khôi phục định dạng chữ chuẩn cho bài viết');
+        }
+
+        function getCurrentPasscode() {
+            return localStorage.getItem('bluehub_admin_pass') || adminPasscode || DEFAULT_PASSCODE;
+        }
+
+        async function saveNewPasscode(newPass) {
+            adminPasscode = newPass;
+            localStorage.setItem('bluehub_admin_pass', newPass);
+            await idbPut(DB_KEY_PASS, newPass);
+        }
+
+        function applyAdminMode() {
+            const label = document.getElementById('adminLockLabel');
+            const icon = document.getElementById('adminLockIcon');
+            if (isAdminMode) {
+                document.body.classList.remove('viewer-locked');
+                if (label) label.innerText = 'Khóa Quản trị';
+                if (icon) {
+                    icon.setAttribute('data-lucide', 'unlock');
+                    icon.className = 'w-3.5 h-3.5 text-emerald-600';
+                }
+            } else {
+                document.body.classList.add('viewer-locked');
+                const bar = document.getElementById('readerFormatBar');
+                if (bar) bar.classList.add('hidden');
+                if (label) label.innerText = 'Quản trị';
+                if (icon) {
+                    icon.setAttribute('data-lucide', 'lock');
+                    icon.className = 'w-3.5 h-3.5 text-slate-500';
+                }
+            }
+            lucide.createIcons();
+        }
+
+        function handleAdminToggleClick() {
+            if (isAdminMode) {
+                isAdminMode = false;
+                sessionStorage.removeItem('bluehub_admin_unlocked');
+                closeThemeDrawer();
+                closeCardModal();
+                closeArticleEditorModal();
+                closeChangePassModal();
+                applyAdminMode();
+                renderPortalHome();
+                if (currentCardContextId && currentArticleContextId) {
+                    openArticleReader(currentCardContextId, currentArticleContextId);
+                }
+                showToast('Đã khóa thẻ Quản trị');
+            } else {
+                openAdminPassModal();
+            }
+        }
+
+        function openAdminPassModal() {
+            document.getElementById('adminPassInput').value = '';
+            document.getElementById('adminPassError').classList.add('hidden');
+            document.getElementById('adminPassModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('adminPassInput').focus(), 50);
+            lucide.createIcons();
+        }
+
+        function closeAdminPassModal() {
+            document.getElementById('adminPassModal').classList.add('hidden');
+        }
+
+        function verifyAdminPass(e) {
+            e.preventDefault();
+            const entered = document.getElementById('adminPassInput').value;
+            if (entered === getCurrentPasscode()) {
+                isAdminMode = true;
+                sessionStorage.setItem('bluehub_admin_unlocked', 'true');
+                closeAdminPassModal();
+                applyAdminMode();
+                renderPortalHome();
+                if (currentCardContextId && currentArticleContextId) {
+                    openArticleReader(currentCardContextId, currentArticleContextId);
+                }
+                showToast('Đã mở quyền Quản trị');
+            } else {
+                document.getElementById('adminPassError').classList.remove('hidden');
+                document.getElementById('adminPassInput').select();
+            }
+        }
+
+        function openChangePassModal() {
+            if (!isAdminMode) return openAdminPassModal();
+            document.getElementById('currentPassInput').value = '';
+            document.getElementById('newPassInput').value = '';
+            document.getElementById('confirmNewPassInput').value = '';
+            const msg = document.getElementById('changePassMsg');
+            msg.classList.add('hidden');
+            msg.innerText = '';
+            document.getElementById('changePassModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('currentPassInput').focus(), 50);
+            lucide.createIcons();
+        }
+
+        function closeChangePassModal() {
+            document.getElementById('changePassModal').classList.add('hidden');
+        }
+
+        async function handleChangeAdminPass(e) {
+            e.preventDefault();
+            if (!isAdminMode) return openAdminPassModal();
+
+            const cur = document.getElementById('currentPassInput').value;
+            const next = document.getElementById('newPassInput').value;
+            const confirmNext = document.getElementById('confirmNewPassInput').value;
+            const msg = document.getElementById('changePassMsg');
+
+            msg.classList.remove('hidden');
+            if (cur !== getCurrentPasscode()) {
+                msg.className = 'text-[11px] font-semibold text-rose-600';
+                msg.innerText = 'Mật khẩu hiện tại không đúng.';
+                return;
+            }
+            if (next.length < 4) {
+                msg.className = 'text-[11px] font-semibold text-rose-600';
+                msg.innerText = 'Mật khẩu mới cần ít nhất 4 ký tự.';
+                return;
+            }
+            if (next !== confirmNext) {
+                msg.className = 'text-[11px] font-semibold text-rose-600';
+                msg.innerText = 'Xác nhận mật khẩu mới không khớp.';
+                return;
+            }
+
+            await saveNewPasscode(next);
+            closeChangePassModal();
+            showToast('Đã đổi mật khẩu Quản trị thành công!');
+        }
+
+        async function resetDefaultPasscode() {
+            if (!isAdminMode) return openAdminPassModal();
+            if (!confirm('Khôi phục mật khẩu Quản trị về mặc định 123456?')) return;
+            await saveNewPasscode(DEFAULT_PASSCODE);
+            closeChangePassModal();
+            showToast('Đã đặt lại mật khẩu mặc định 123456');
+        }
+
+        function openIndexedDB() {
+            return new Promise((resolve, reject) => {
+                if (!window.indexedDB) return reject(new Error('No IndexedDB'));
+                const req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+                };
+                req.onsuccess = (e) => resolve(e.target.result);
+                req.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function idbGet(key) {
+            try {
+                const db = await openIndexedDB();
+                return new Promise((resolve) => {
+                    const tx = db.transaction(DB_STORE, 'readonly');
+                    const req = tx.objectStore(DB_STORE).get(key);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => resolve(undefined);
+                });
+            } catch (_) {
+                return undefined;
+            }
+        }
+
+        async function idbPut(key, value) {
+            try {
+                const db = await openIndexedDB();
+                await new Promise((resolve, reject) => {
+                    const tx = db.transaction(DB_STORE, 'readwrite');
+                    const req = tx.objectStore(DB_STORE).put(value, key);
+                    req.onsuccess = () => resolve();
+                    req.onerror = () => reject(req.error);
+                });
+            } catch (_) {}
+        }
+
+        async function saveCardsAuto() {
+            const el = document.getElementById('autoSaveText');
+            if (el) el.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Đang lưu...';
+
+            await idbPut(DB_KEY_CARDS, communityCards);
+            try {
+                localStorage.setItem('bluehub_cards_v2', JSON.stringify(communityCards));
+            } catch (_) {}
+
+            if (typeof window.syncCardsToCloud === 'function') {
+                await window.syncCardsToCloud();
+            }
+
+            const now = new Date();
+            const t = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            if (el) el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đã lưu ${t}`;
+        }
+
+        async function persistUiConfig() {
+            localStorage.setItem('bluehub_ui_v2', JSON.stringify(uiConfig));
+            await idbPut(DB_KEY_UI, uiConfig);
+            if (typeof window.syncUiConfigToCloud === 'function') {
+                await window.syncUiConfigToCloud();
+            }
+        }
+
+        window.onload = async () => {
+            const savedCards = await idbGet(DB_KEY_CARDS);
+            if (Array.isArray(savedCards) && savedCards.length > 0) {
+                communityCards = savedCards;
+            }
+            const savedUi = await idbGet(DB_KEY_UI);
+            if (savedUi && typeof savedUi === 'object') {
+                uiConfig = { ...defaultUiConfig, ...savedUi };
+            }
+            const savedPass = await idbGet(DB_KEY_PASS);
+            if (typeof savedPass === 'string' && savedPass.length >= 4) {
+                adminPasscode = savedPass;
+                localStorage.setItem('bluehub_admin_pass', savedPass);
+            }
+
+            applyAdminMode();
+            applyUiConfig(uiConfig);
+            renderPortalHome();
+            lucide.createIcons();
+        };
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function sanitizeHttpUrl(rawUrl) {
+            if (!rawUrl) return '';
+            const trimmed = String(rawUrl).trim();
+            if (!trimmed) return '';
+            if (/^https?:\/\//i.test(trimmed)) return trimmed;
+            if (/^www\./i.test(trimmed)) return `https://${trimmed}`;
+            return '';
+        }
+
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            const m = String(url).match(/(?:youtube\.com\/(?:watch\?.*v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+            return m ? m[1] : null;
+        }
+
+        function applyUiConfig(cfg = uiConfig) {
+            document.documentElement.style.setProperty('--brand-primary', cfg.primaryColor || '#1d4ed8');
+            document.documentElement.style.setProperty('--brand-primary-dark', cfg.primaryDark || '#1e3a8a');
+            document.documentElement.style.setProperty('--brand-soft', cfg.softColor || '#eff6ff');
+
+            document.getElementById('headerBrandName').innerText = cfg.brandName || 'BS Chuyên Khoa';
+            document.getElementById('headerBrandSub').innerText = cfg.brandSub || '';
+            document.getElementById('footerBrandName').innerText = cfg.brandName || 'BS Chuyên Khoa';
+            document.getElementById('footerTagline').innerText = cfg.brandSub || '';
+            document.title = `${cfg.brandName || 'BS Chuyên Khoa'} - Cổng Thông Tin Y Khoa`;
+
+            const logoImg = document.getElementById('brandLogoImg');
+            const defaultIcon = document.getElementById('brandDefaultIcon');
+            if (cfg.logoImgUrl && cfg.logoImgUrl.trim()) {
+                logoImg.src = cfg.logoImgUrl.trim();
+                logoImg.classList.remove('hidden');
+                defaultIcon.classList.add('hidden');
+            } else {
+                logoImg.src = '';
+                logoImg.classList.add('hidden');
+                defaultIcon.classList.remove('hidden');
+            }
+
+            const bannerImgEl = document.getElementById('topBannerImageEl');
+            const bannerFallbackEl = document.getElementById('topBannerFallbackEl');
+            if (cfg.topBannerImg && cfg.topBannerImg.trim()) {
+                bannerImgEl.src = cfg.topBannerImg.trim();
+                bannerImgEl.classList.remove('hidden');
+                bannerFallbackEl.classList.add('hidden');
+            } else {
+                bannerImgEl.src = '';
+                bannerImgEl.classList.add('hidden');
+                bannerFallbackEl.classList.remove('hidden');
+                document.getElementById('topBannerTitleDisplay').innerText = cfg.topBannerTitle || defaultUiConfig.topBannerTitle;
+                document.getElementById('topBannerSubDisplay').innerText = cfg.topBannerSub || defaultUiConfig.topBannerSub;
+            }
+
+            document.getElementById('spotlightBoxTitle').innerText = cfg.spotlightTitle || 'CHUYÊN MỤC NỔI BẬT';
+            document.getElementById('promoSideTitle').innerText = cfg.promoTitle || 'Cập nhật hướng dẫn & tài liệu y khoa';
+            document.getElementById('sectionCardsHeading').innerText = cfg.sectionHeading || 'Các Thẻ Chuyên Mục & Chức Năng';
+
+            const grid = document.getElementById('functionalCardsGrid');
+            const cols = {
+                '2': 'grid-cols-1 md:grid-cols-2',
+                '3': 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+                '4': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+            };
+            grid.className = `grid ${cols[cfg.gridCols] || cols['3']} gap-5`;
+        }
+
+        function openThemeDrawer() {
+            if (!isAdminMode) return openAdminPassModal();
+            document.getElementById('cfgTopBannerImg').value = uiConfig.topBannerImg || '';
+            document.getElementById('cfgTopBannerTitle').value = uiConfig.topBannerTitle || defaultUiConfig.topBannerTitle;
+            document.getElementById('cfgTopBannerSub').value = uiConfig.topBannerSub || defaultUiConfig.topBannerSub;
+            document.getElementById('cfgPrimaryColor').value = uiConfig.primaryColor || '#1d4ed8';
+            document.getElementById('cfgBrandName').value = uiConfig.brandName || 'BS Chuyên Khoa';
+            document.getElementById('cfgBrandSub').value = uiConfig.brandSub || '';
+            document.getElementById('cfgLogoImgUrl').value = uiConfig.logoImgUrl || '';
+            document.getElementById('cfgSpotlightTitle').value = uiConfig.spotlightTitle || 'CHUYÊN MỤC NỔI BẬT';
+            document.getElementById('cfgPromoTitle').value = uiConfig.promoTitle || '';
+            document.getElementById('cfgSectionHeading').value = uiConfig.sectionHeading || '';
+            document.getElementById('cfgGridCols').value = uiConfig.gridCols || '3';
+
+            document.getElementById('themeDrawerOverlay').classList.remove('hidden');
+            document.getElementById('themeDrawer').classList.remove('translate-x-full');
+        }
+
+        function closeThemeDrawer() {
+            document.getElementById('themeDrawerOverlay').classList.add('hidden');
+            document.getElementById('themeDrawer').classList.add('translate-x-full');
+        }
+
+        function selectColorPreset(primary, dark, soft) {
+            document.getElementById('cfgPrimaryColor').value = primary;
+            uiConfig.primaryDark = dark;
+            uiConfig.softColor = soft;
+            saveAndApplyUiConfig();
+        }
+
+        async function saveAndApplyUiConfig() {
+            uiConfig = {
+                ...uiConfig,
+                topBannerImg: document.getElementById('cfgTopBannerImg').value.trim(),
+                topBannerTitle: document.getElementById('cfgTopBannerTitle').value.trim() || defaultUiConfig.topBannerTitle,
+                topBannerSub: document.getElementById('cfgTopBannerSub').value.trim() || defaultUiConfig.topBannerSub,
+                primaryColor: document.getElementById('cfgPrimaryColor').value || '#1d4ed8',
+                brandName: document.getElementById('cfgBrandName').value.trim() || 'BS Chuyên Khoa',
+                brandSub: document.getElementById('cfgBrandSub').value.trim(),
+                logoImgUrl: document.getElementById('cfgLogoImgUrl').value.trim(),
+                spotlightTitle: document.getElementById('cfgSpotlightTitle').value.trim() || 'CHUYÊN MỤC NỔI BẬT',
+                promoTitle: document.getElementById('cfgPromoTitle').value.trim(),
+                sectionHeading: document.getElementById('cfgSectionHeading').value.trim() || 'Các Thẻ Chuyên Mục & Chức Năng',
+                gridCols: document.getElementById('cfgGridCols').value || '3'
+            };
+            applyUiConfig(uiConfig);
+            await persistUiConfig();
+        }
+
+        async function resetUiConfig() {
+            if (!isAdminMode) return openAdminPassModal();
+            uiConfig = { ...defaultUiConfig };
+            openThemeDrawer();
+            applyUiConfig(uiConfig);
+            await persistUiConfig();
+            showToast('Đã khôi phục giao diện mặc định');
+        }
+
+        function goHome() {
+            activeCategory = 'all';
+            currentCardContextId = null;
+            currentArticleContextId = null;
+            document.getElementById('articleReaderView').classList.add('hidden');
+            document.getElementById('portalHomeView').classList.remove('hidden');
+            setCategoryFilter('all');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setCategoryFilter(cat) {
+            activeCategory = cat;
+            document.querySelectorAll('.nav-cat-btn').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.className = 'nav-cat-btn px-2.5 py-1 rounded-lg text-[13px] font-bold text-brand-primary bg-brand-soft whitespace-nowrap transition-colors shrink-0';
+                } else {
+                    btn.className = 'nav-cat-btn px-2.5 py-1 rounded-lg text-[13px] font-semibold text-slate-700 hover:text-brand-primary hover:bg-slate-50 whitespace-nowrap transition-colors shrink-0';
+                }
+            });
+            document.getElementById('articleReaderView').classList.add('hidden');
+            document.getElementById('portalHomeView').classList.remove('hidden');
+            renderPortalHome();
+        }
+
+        function flattenArticles() {
+            const q = (document.getElementById('globalSearch').value || '').toLowerCase().trim();
+            const list = [];
+            communityCards.forEach(card => {
+                if (activeCategory !== 'all' && card.category !== activeCategory) return;
+                (card.items || []).forEach(item => {
+                    const match = !q ||
+                        (item.title && item.title.toLowerCase().includes(q)) ||
+                        (item.sapo && item.sapo.toLowerCase().includes(q)) ||
+                        (item.body && item.body.toLowerCase().includes(q)) ||
+                        (item.topic && item.topic.toLowerCase().includes(q)) ||
+                        (card.title && card.title.toLowerCase().includes(q));
+                    if (match) list.push({ ...item, cardId: card.id, cardTitle: card.title });
+                });
+            });
+            return list;
+        }
+
+        function handlePromoClick() {
+            const firstCard = communityCards[0];
+            if (firstCard && firstCard.items && firstCard.items[0]) {
+                openArticleReader(firstCard.id, firstCard.items[0].id);
+            }
+        }
+
+        function renderPortalHome() {
+            const articles = flattenArticles();
+            const heroCol = document.getElementById('featuredHeroCol');
+            const midCol = document.getElementById('middleFeedCol');
+            const spotList = document.getElementById('spotlightCardsList');
+
+            if (articles.length > 0) {
+                const lead = articles[0];
+                heroCol.innerHTML = `
+                    <div onclick="openArticleReader('${lead.cardId}', ${lead.id})" class="cursor-pointer group space-y-3">
+                        <div class="aspect-[16/10] w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-200/70">
+                            <img src="${escapeHtml(lead.imageUrl || 'https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=1200&q=80')}" alt="${escapeHtml(lead.title)}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300">
+                        </div>
+                        <h1 class="font-display font-extrabold text-xl sm:text-2xl text-slate-950 group-hover:text-brand-primary leading-snug transition-colors">
+                            ${escapeHtml(lead.title)}
+                        </h1>
+                        <p class="text-sm text-slate-600 leading-relaxed line-clamp-2">
+                            ${escapeHtml(lead.sapo || lead.body)}
+                        </p>
+                    </div>
+                `;
+
+                const sideItems = articles.slice(1, 3);
+                midCol.innerHTML = sideItems.map((art, idx) => `
+                    <div onclick="openArticleReader('${art.cardId}', ${art.id})" class="cursor-pointer group space-y-2 ${idx > 0 ? 'pt-4 border-t border-slate-200' : ''}">
+                        ${idx === 0 ? `
+                            <div class="aspect-[16/10] w-full rounded-lg overflow-hidden bg-slate-100 mb-2">
+                                <img src="${escapeHtml(art.imageUrl || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80')}" alt="${escapeHtml(art.title)}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform">
+                            </div>
+                        ` : ''}
+                        <h3 class="font-display font-bold text-sm sm:text-[15px] text-slate-900 group-hover:text-brand-primary leading-snug">
+                            ${escapeHtml(art.title)}
+                        </h3>
+                        ${idx === 0 ? `<p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">${escapeHtml(art.sapo || art.body)}</p>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                heroCol.innerHTML = `<div class="p-8 rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-500">Không tìm thấy bài viết phù hợp.</div>`;
+                midCol.innerHTML = '';
+            }
+
+            spotList.innerHTML = communityCards.slice(0, 3).map(card => {
+                const firstItem = (card.items && card.items[0]) || null;
+                const thumb = card.coverImage || (firstItem && firstItem.imageUrl) || 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=400&q=70';
+                const headline = (firstItem && firstItem.title) || card.description;
+                return `
+                    <div onclick="openCardFirstArticle('${card.id}')" class="bg-white rounded-xl p-2.5 border border-slate-200/80 hover:border-brand-primary cursor-pointer flex items-center gap-3 shadow-2xs transition-all">
+                        <img src="${escapeHtml(thumb)}" alt="${escapeHtml(card.title)}" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-slate-100">
+                        <div class="min-w-0">
+                            <span class="text-[10px] font-bold uppercase text-brand-primary block truncate">${escapeHtml(card.title)}</span>
+                            <p class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 mt-0.5">${escapeHtml(headline)}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const grid = document.getElementById('functionalCardsGrid');
+            const visibleCards = communityCards.filter(c => activeCategory === 'all' || c.category === activeCategory);
+
+            grid.innerHTML = visibleCards.map(card => {
+                const topics = [...new Set((card.items || []).map(i => i.topic || 'Đề mục chung'))];
+                return `
+                    <div class="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col justify-between hover:border-brand-primary transition-colors shadow-2xs">
+                        <div>
+                            ${card.coverImage ? `
+                                <div onclick="openCardFirstArticle('${card.id}')" class="h-32 w-full overflow-hidden bg-slate-100 cursor-pointer">
+                                    <img src="${escapeHtml(card.coverImage)}" alt="${escapeHtml(card.title)}" class="w-full h-full object-cover">
+                                </div>
+                            ` : `<div class="h-1.5 w-full bg-brand-primary"></div>`}
+
+                            <div class="p-4">
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <span class="px-2.5 py-0.5 rounded-full bg-brand-soft text-brand-primary text-[11px] font-bold">
+                                        ${(card.items || []).length} bài • ${topics.length} đề mục
+                                    </span>
+                                    <div data-admin-only class="flex items-center gap-1">
+                                        <button type="button" onclick="editCardById('${card.id}')" class="px-2 py-0.5 text-[11px] font-bold text-slate-600 hover:text-brand-primary hover:bg-slate-100 rounded">
+                                            Sửa thẻ
+                                        </button>
+                                        <button type="button" onclick="deleteCardById('${card.id}')" class="p-1 text-slate-400 hover:text-rose-600 rounded" title="Xóa thẻ">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <h3 onclick="openCardFirstArticle('${card.id}')" class="font-display font-extrabold text-base text-slate-950 hover:text-brand-primary cursor-pointer flex items-center gap-2">
+                                    <i data-lucide="${card.icon || 'folder'}" class="w-4 h-4 text-brand-primary shrink-0"></i>
+                                    <span class="truncate">${escapeHtml(card.title)}</span>
+                                </h3>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">
+                                    ${escapeHtml(card.description)}
+                                </p>
+
+                                <div class="mt-3 space-y-1.5">
+                                    ${(card.items || []).slice(0, 2).map(item => `
+                                        <button type="button" onclick="openArticleReader('${card.id}', ${item.id})" class="w-full text-left px-3 py-2 rounded-lg bg-slate-50 hover:bg-brand-soft border border-slate-100 text-xs flex items-center justify-between gap-2 transition-colors">
+                                            <span class="font-semibold text-slate-800 truncate">${escapeHtml(item.title)}</span>
+                                            <span class="text-[10px] font-bold text-brand-primary shrink-0">${escapeHtml(item.topic || 'Đề mục')}</span>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-4 py-3 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between">
+                            <button type="button" onclick="openCardFirstArticle('${card.id}')" class="text-xs font-bold text-brand-primary hover:underline flex items-center gap-1">
+                                <span>Mở đọc trang tin</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button type="button" data-admin-only onclick="openArticleEditorModal('${card.id}')" class="text-xs font-semibold text-slate-600 hover:text-slate-950">
+                                + Thêm bài
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function openCardFirstArticle(cardId) {
+            const card = communityCards.find(c => c.id === cardId);
+            if (!card) return;
+            if (card.items && card.items.length > 0) {
+                openArticleReader(card.id, card.items[0].id);
+            } else if (isAdminMode) {
+                openArticleEditorModal(card.id);
+            } else {
+                showToast('Thẻ chức năng này chưa có bài viết.');
+            }
+        }
+
+        function openArticleReader(cardId, articleId) {
+            const card = communityCards.find(c => c.id === cardId);
+            if (!card) return;
+            const art = (card.items || []).find(i => i.id === articleId) || (card.items && card.items[0]);
+            if (!art) return;
+
+            currentCardContextId = card.id;
+            currentArticleContextId = art.id;
+
+            document.getElementById('portalHomeView').classList.add('hidden');
+            document.getElementById('articleReaderView').classList.remove('hidden');
+
+            document.getElementById('readerParentCardBtn').innerText = card.title;
+            document.getElementById('readerParentCardBtn').onclick = () => openCardFirstArticle(card.id);
+            document.getElementById('readerTopicBreadcrumb').innerText = art.topic || 'Đề mục';
+            document.getElementById('readerTitle').innerText = art.title;
+            document.getElementById('readerDate').innerText = art.date || '22-11-2026';
+            document.getElementById('readerTopicBadge').innerText = art.topic || 'Đề mục';
+            document.getElementById('readerAuthor').innerText = art.author || 'BS Chuyên Khoa';
+            document.getElementById('readerSapo').innerText = art.sapo || '';
+
+            const mediaBox = document.getElementById('readerMediaBox');
+            const ytId = extractYouTubeId(art.linkUrl) || extractYouTubeId(art.fileName);
+            if (ytId) {
+                mediaBox.classList.remove('hidden');
+                mediaBox.innerHTML = `<div class="aspect-video w-full"><iframe src="https://www.youtube.com/embed/${ytId}?rel=0" class="w-full h-full border-0" allowfullscreen></iframe></div>`;
+            } else if (art.imageUrl) {
+                mediaBox.classList.remove('hidden');
+                mediaBox.innerHTML = `<img src="${escapeHtml(art.imageUrl)}" alt="${escapeHtml(art.title)}" class="w-full max-h-[460px] object-cover bg-white">`;
+            } else {
+                mediaBox.classList.add('hidden');
+                mediaBox.innerHTML = '';
+            }
+
+            const secBox = document.getElementById('readerSectionsBox');
+            const lines = (art.body || '').split('\n');
+            secBox.innerHTML = lines.map(line => {
+                const t = line.trim();
+                if (!t) return '';
+                if (t.startsWith('## ')) {
+                    return `<h2>${escapeHtml(t.replace(/^##\s+/, ''))}</h2>`;
+                }
+                return `<p>${escapeHtml(t)}</p>`;
+            }).join('');
+
+            applyReaderBodyStyle(art.style);
+
+            const linkBox = document.getElementById('readerLinkBox');
+            const safeLink = sanitizeHttpUrl(art.linkUrl);
+            if (safeLink) {
+                const label = (art.linkLabel && art.linkLabel.trim()) || safeLink;
+                linkBox.classList.remove('hidden');
+                linkBox.innerHTML = `
+                    <a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-brand-soft hover:opacity-95 border border-slate-200 transition-opacity">
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-bold uppercase text-brand-primary">Đường link tham khảo</p>
+                            <p class="text-sm font-bold text-slate-900 truncate">${escapeHtml(label)}</p>
+                            <p class="text-xs text-brand-primary truncate">${escapeHtml(safeLink)}</p>
+                        </div>
+                        <span class="px-3 py-1.5 rounded-lg bg-brand-primary text-white text-xs font-bold shrink-0">Mở link</span>
+                    </a>
+                `;
+            } else {
+                linkBox.classList.add('hidden');
+                linkBox.innerHTML = '';
+            }
+
+            const attBox = document.getElementById('readerAttachmentBox');
+            if (art.fileDataUrl || art.fileName) {
+                attBox.classList.remove('hidden');
+                attBox.innerHTML = `
+                    <div class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-bold uppercase text-slate-500">Tài liệu đính kèm</p>
+                            <p class="text-sm font-bold text-slate-900 truncate">${escapeHtml(art.fileName || 'Tài liệu')}</p>
+                        </div>
+                        <button type="button" onclick="openAttachmentViewer(${art.id})" class="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shrink-0">
+                            Xem tài liệu
+                        </button>
+                    </div>
+                `;
+            } else {
+                attBox.classList.add('hidden');
+                attBox.innerHTML = '';
+            }
+
+            document.getElementById('readerCardTitleSide').innerText = card.title;
+            const sibBox = document.getElementById('readerSiblingArticles');
+            sibBox.innerHTML = (card.items || []).map(item => {
+                const active = item.id === art.id;
+                return `
+                    <button type="button" onclick="openArticleReader('${card.id}', ${item.id})" class="w-full text-left p-3 rounded-xl border transition-all ${active ? 'bg-brand-primary text-white border-brand-primary' : 'bg-white text-slate-800 border-slate-200 hover:border-brand-primary'}">
+                        <span class="block text-[10px] font-bold uppercase ${active ? 'opacity-80' : 'text-brand-primary'}">${escapeHtml(item.topic || 'Đề mục')}</span>
+                        <span class="block text-xs font-bold leading-snug mt-0.5">${escapeHtml(item.title)}</span>
+                    </button>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openCardModal() {
+            if (!isAdminMode) return openAdminPassModal();
+            document.getElementById('cardConfigForm').reset();
+            document.getElementById('editCardId').value = '';
+            document.getElementById('cardModalHeading').innerText = 'Tạo thẻ chức năng mới';
+            document.getElementById('cardFormModal').classList.remove('hidden');
+        }
+
+        function editCardById(cardId) {
+            if (!isAdminMode) return openAdminPassModal();
+            const card = communityCards.find(c => c.id === cardId);
+            if (!card) return;
+            document.getElementById('editCardId').value = card.id;
+            document.getElementById('cardTitleInput').value = card.title;
+            document.getElementById('cardDescInput').value = card.description;
+            document.getElementById('cardCatInput').value = card.category || 'event';
+            document.getElementById('cardIconInput').value = card.icon || 'megaphone';
+            document.getElementById('cardCoverUrlInput').value = card.coverImage || '';
+            document.getElementById('cardModalHeading').innerText = 'Chỉnh sửa thẻ chức năng';
+            document.getElementById('cardFormModal').classList.remove('hidden');
+        }
+
+        function closeCardModal() {
+            document.getElementById('cardFormModal').classList.add('hidden');
+        }
+
+        async function handleSaveCard(e) {
+            e.preventDefault();
+            if (!isAdminMode) return openAdminPassModal();
+            const editId = document.getElementById('editCardId').value;
+            const title = document.getElementById('cardTitleInput').value.trim();
+            const description = document.getElementById('cardDescInput').value.trim();
+            const category = document.getElementById('cardCatInput').value;
+            const icon = document.getElementById('cardIconInput').value;
+            const coverImage = document.getElementById('cardCoverUrlInput').value.trim();
+
+            if (editId) {
+                const c = communityCards.find(x => x.id === editId);
+                if (c) {
+                    c.title = title;
+                    c.description = description;
+                    c.category = category;
+                    c.icon = icon;
+                    c.coverImage = coverImage;
+                }
+            } else {
+                communityCards.push({
+                    id: 'card-' + Date.now(),
+                    title,
+                    description,
+                    category,
+                    icon,
+                    coverImage,
+                    items: []
+                });
+            }
+
+            await saveCardsAuto();
+            closeCardModal();
+            renderPortalHome();
+            if (currentCardContextId === editId && currentArticleContextId) {
+                openArticleReader(currentCardContextId, currentArticleContextId);
+            }
+            showToast('Đã lưu thẻ chức năng thành công!');
+        }
+
+        async function deleteCardById(cardId) {
+            if (!isAdminMode) return openAdminPassModal();
+            if (!confirm('Xóa thẻ chức năng này?')) return;
+            communityCards = communityCards.filter(c => c.id !== cardId);
+            await saveCardsAuto();
+            renderPortalHome();
+            if (currentCardContextId === cardId) goHome();
+            showToast('Đã xóa thẻ!');
+        }
+
+        function openArticleEditorModal(presetCardId = null) {
+            if (!isAdminMode) return openAdminPassModal();
+            const sel = document.getElementById('articleCardSelect');
+            sel.innerHTML = communityCards.map(c => `<option value="${c.id}">${escapeHtml(c.title)}</option>`).join('');
+            document.getElementById('articleForm').reset();
+            document.getElementById('editArticleId').value = '';
+            document.getElementById('articleFileDataUrl').value = '';
+            document.getElementById('articleFileMime').value = '';
+            document.getElementById('articleAlignInput').value = DEFAULT_ARTICLE_STYLE.align;
+            document.getElementById('articleFontInput').value = DEFAULT_ARTICLE_STYLE.fontFamily;
+            document.getElementById('articleSizeInput').value = String(DEFAULT_ARTICLE_STYLE.fontSize);
+            document.getElementById('articleColorInput').value = DEFAULT_ARTICLE_STYLE.textColor;
+            if (presetCardId) sel.value = presetCardId;
+            document.getElementById('articleModalHeading').innerText = 'Đăng trang tin mới';
+            document.getElementById('articleEditorModal').classList.remove('hidden');
+        }
+
+        function editCurrentReaderArticle() {
+            if (!isAdminMode) return openAdminPassModal();
+            if (!currentCardContextId || !currentArticleContextId) return;
+            const card = communityCards.find(c => c.id === currentCardContextId);
+            const art = (card && card.items || []).find(i => i.id === currentArticleContextId);
+            if (!card || !art) return;
+
+            const sel = document.getElementById('articleCardSelect');
+            sel.innerHTML = communityCards.map(c => `<option value="${c.id}">${escapeHtml(c.title)}</option>`).join('');
+            sel.value = card.id;
+
+            const st = normalizeArticleStyle(art.style);
+            document.getElementById('editArticleId').value = art.id;
+            document.getElementById('articleTopicInput').value = art.topic || '';
+            document.getElementById('articleAuthorInput').value = art.author || '';
+            document.getElementById('articleTitleInput').value = art.title || '';
+            document.getElementById('articleSapoInput').value = art.sapo || '';
+            document.getElementById('articleBodyInput').value = art.body || '';
+            document.getElementById('articleLinkLabelInput').value = art.linkLabel || '';
+            document.getElementById('articleLinkUrlInput').value = art.linkUrl || '';
+            document.getElementById('articleImageInput').value = art.imageUrl || '';
+            document.getElementById('articleFileNameInput').value = art.fileName || '';
+            document.getElementById('articleFileDataUrl').value = art.fileDataUrl || '';
+            document.getElementById('articleFileMime').value = art.fileMime || '';
+            document.getElementById('articleAlignInput').value = st.align;
+            document.getElementById('articleFontInput').value = st.fontFamily;
+            document.getElementById('articleSizeInput').value = String(st.fontSize);
+            document.getElementById('articleColorInput').value = /^#[0-9a-fA-F]{6}$/.test(st.textColor) ? st.textColor : '#1e293b';
+
+            document.getElementById('articleModalHeading').innerText = 'Chỉnh sửa bài viết';
+            document.getElementById('articleEditorModal').classList.remove('hidden');
+        }
+
+        async function deleteCurrentReaderArticle() {
+            if (!isAdminMode) return openAdminPassModal();
+            if (!currentCardContextId || !currentArticleContextId) return;
+            if (!confirm('Xóa bài viết này?')) return;
+            const card = communityCards.find(c => c.id === currentCardContextId);
+            if (!card) return;
+            card.items = (card.items || []).filter(i => i.id !== currentArticleContextId);
+            await saveCardsAuto();
+            renderPortalHome();
+            if (card.items.length > 0) {
+                openArticleReader(card.id, card.items[0].id);
+            } else {
+                goHome();
+            }
+            showToast('Đã xóa bài viết!');
+        }
+
+        function closeArticleEditorModal() {
+            document.getElementById('articleEditorModal').classList.add('hidden');
+        }
+
+        function handleImageUpload(event, inputId, cb) {
+            if (!isAdminMode) return openAdminPassModal();
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById(inputId).value = e.target.result;
+                if (typeof cb === 'function') cb();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleArticleFileSelect(event) {
+            if (!isAdminMode) return openAdminPassModal();
+            const file = event.target.files[0];
+            if (!file) return;
+            document.getElementById('articleFileNameInput').value = file.name;
+            document.getElementById('articleFileMime').value = file.type || 'application/octet-stream';
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('articleFileDataUrl').value = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function handleSaveArticle(e) {
+            e.preventDefault();
+            if (!isAdminMode) return openAdminPassModal();
+            const targetCardId = document.getElementById('articleCardSelect').value;
+            const card = communityCards.find(c => c.id === targetCardId);
+            if (!card) return;
+
+            const editId = document.getElementById('editArticleId').value;
+            const existingArt = editId
+                ? communityCards.flatMap(c => c.items || []).find(i => i.id == editId)
+                : null;
+
+            const today = new Date();
+            const dateStr = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
+
+            const payload = {
+                id: editId ? Number(editId) : Date.now(),
+                topic: document.getElementById('articleTopicInput').value.trim() || 'Đề mục chung',
+                author: document.getElementById('articleAuthorInput').value.trim() || 'BS Chuyên Khoa',
+                title: document.getElementById('articleTitleInput').value.trim(),
+                sapo: document.getElementById('articleSapoInput').value.trim(),
+                body: document.getElementById('articleBodyInput').value.trim(),
+                linkLabel: document.getElementById('articleLinkLabelInput').value.trim(),
+                linkUrl: document.getElementById('articleLinkUrlInput').value.trim(),
+                imageUrl: document.getElementById('articleImageInput').value.trim(),
+                fileName: document.getElementById('articleFileNameInput').value.trim(),
+                fileDataUrl: document.getElementById('articleFileDataUrl').value.trim(),
+                fileMime: document.getElementById('articleFileMime').value.trim(),
+                date: existingArt && existingArt.date ? existingArt.date : dateStr,
+                style: {
+                    align: document.getElementById('articleAlignInput').value || DEFAULT_ARTICLE_STYLE.align,
+                    fontFamily: document.getElementById('articleFontInput').value || DEFAULT_ARTICLE_STYLE.fontFamily,
+                    fontSize: Number(document.getElementById('articleSizeInput').value) || DEFAULT_ARTICLE_STYLE.fontSize,
+                    textColor: document.getElementById('articleColorInput').value || DEFAULT_ARTICLE_STYLE.textColor
+                }
+            };
+
+            if (editId) {
+                communityCards.forEach(c => {
+                    c.items = (c.items || []).filter(i => i.id != editId);
+                });
+                card.items.unshift(payload);
+            } else {
+                card.items.unshift(payload);
+            }
+
+            await saveCardsAuto();
+            closeArticleEditorModal();
+            renderPortalHome();
+            openArticleReader(card.id, payload.id);
+            showToast('Đã lưu và cập nhật bài viết!');
+        }
+
+        async function openAttachmentViewer(articleId) {
+            for (const card of communityCards) {
+                const art = (card.items || []).find(i => i.id === articleId);
+                if (!art) continue;
+                const url = art.fileDataUrl || sanitizeHttpUrl(art.linkUrl);
+                const name = art.fileName || art.title || 'Tài liệu';
+                if (!url) {
+                    showToast('Chưa có file hoặc đường link để xem.');
+                    return;
+                }
+                document.getElementById('viewerFileTitle').innerText = name;
+                const dl = document.getElementById('viewerDownloadLink');
+                dl.href = url;
+                dl.download = name;
+                document.getElementById('fileViewerModal').classList.remove('hidden');
+
+                const body = document.getElementById('fileViewerBody');
+                if ((url.toLowerCase().includes('.pdf') || url.startsWith('data:application/pdf')) && window.pdfjsLib) {
+                    try {
+                        body.innerHTML = '<p class="my-auto text-sm font-semibold text-slate-700">Đang tải PDF...</p>';
+                        const pdf = await pdfjsLib.getDocument(url).promise;
+                        body.innerHTML = '';
+                        for (let p = 1; p <= pdf.numPages; p++) {
+                            const page = await pdf.getPage(p);
+                            const vp = page.getViewport({ scale: 1.15 });
+                            const canvas = document.createElement('canvas');
+                            canvas.width = vp.width;
+                            canvas.height = vp.height;
+                            canvas.className = 'bg-white shadow mb-4 rounded max-w-full h-auto';
+                            body.appendChild(canvas);
+                            await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+                        }
+                        return;
+                    } catch (_) {}
+                }
+                body.innerHTML = `<iframe src="${escapeHtml(url)}" class="w-full h-full rounded-xl bg-white border-0"></iframe>`;
+                return;
+            }
+        }
+
+        function closeFileViewerModal() {
+            document.getElementById('fileViewerModal').classList.add('hidden');
+            document.getElementById('fileViewerBody').innerHTML = '';
+        }
+
+        function exportBackupJson() {
+            if (!isAdminMode) return openAdminPassModal();
+            const payload = { uiConfig, communityCards };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `bs-chuyen-khoa-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            showToast('Đã xuất file sao lưu JSON!');
+        }
+
+        function importBackupJson(event) {
+            if (!isAdminMode) return openAdminPassModal();
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed.communityCards)) {
+                        communityCards = parsed.communityCards;
+                        await saveCardsAuto();
+                    }
+                    if (parsed.uiConfig) {
+                        uiConfig = { ...defaultUiConfig, ...parsed.uiConfig };
+                        applyUiConfig(uiConfig);
+                        await persistUiConfig();
+                    }
+                    goHome();
+                    showToast('Đã khôi phục dữ liệu từ file JSON!');
+                } catch (_) {
+                    showToast('File JSON không hợp lệ.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        async function resetDemoData() {
+            if (!isAdminMode) return openAdminPassModal();
+            if (!confirm('Khôi phục dữ liệu thẻ mẫu ban đầu?')) return;
+            communityCards = JSON.parse(JSON.stringify(defaultCards));
+            await saveCardsAuto();
+            goHome();
+            showToast('Đã khôi phục dữ liệu mẫu!');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastText').innerText = msg;
+            t.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 2600);
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0hsg73wu51yOqGgHfByDfD4NuMtOfFGA",
+            authDomain: "bschuyenkhoa.firebaseapp.com",
+            databaseURL: "https://bschuyenkhoa-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "bschuyenkhoa",
+            storageBucket: "bschuyenkhoa.firebasestorage.app",
+            messagingSenderId: "580577262768",
+            appId: "1:580577262768:web:23c67cba9f7df59677cf75",
+            measurementId: "G-3YSLGGRRBN"
+        };
+
+        let firebaseDb = null;
+        let isApplyingRemote = false;
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            firebaseDb = getDatabase(app);
+
+            onValue(ref(firebaseDb, "bschuyenkhoa/portalCards"), (snapshot) => {
+                const remoteCards = snapshot.val();
+                if (Array.isArray(remoteCards) && remoteCards.length > 0) {
+                    isApplyingRemote = true;
+                    communityCards = remoteCards;
+                    renderPortalHome();
+                    if (currentCardContextId && currentArticleContextId) {
+                        openArticleReader(currentCardContextId, currentArticleContextId);
+                    }
+                    isApplyingRemote = false;
+                }
+            });
+
+            onValue(ref(firebaseDb, "bschuyenkhoa/portalUi"), (snapshot) => {
+                const remoteUi = snapshot.val();
+                if (remoteUi && typeof remoteUi === "object") {
+                    isApplyingRemote = true;
+                    uiConfig = { ...defaultUiConfig, ...uiConfig, ...remoteUi };
+                    localStorage.setItem("bluehub_ui_v2", JSON.stringify(uiConfig));
+                    applyUiConfig(uiConfig);
+                    isApplyingRemote = false;
+                }
+            });
+        } catch (err) {
+            console.warn("Firebase init:", err);
+        }
+
+        window.syncCardsToCloud = async function () {
+            if (firebaseDb && !isApplyingRemote) {
+                try {
+                    const lightweight = (communityCards || []).map(card => ({
+                        ...card,
+                        coverImage: card.coverImage && card.coverImage.length > 800 * 1024 ? "" : card.coverImage,
+                        items: (card.items || []).map(item => ({
+                            ...item,
+                            imageUrl: item.imageUrl && item.imageUrl.length > 800 * 1024 ? "" : item.imageUrl,
+                            fileDataUrl: item.fileDataUrl && item.fileDataUrl.length > 800 * 1024 ? "" : item.fileDataUrl
+                        }))
+                    }));
+                    await set(ref(firebaseDb, "bschuyenkhoa/portalCards"), lightweight);
+                } catch (_) {}
+            }
+        };
+
+        window.syncUiConfigToCloud = async function () {
+            if (firebaseDb && !isApplyingRemote) {
+                try {
+                    const safeUi = {
+                        ...uiConfig,
+                        topBannerImg: uiConfig.topBannerImg && uiConfig.topBannerImg.length > 800 * 1024 ? "" : uiConfig.topBannerImg,
+                        logoImgUrl: uiConfig.logoImgUrl && uiConfig.logoImgUrl.length > 800 * 1024 ? "" : uiConfig.logoImgUrl
+                    };
+                    await set(ref(firebaseDb, "bschuyenkhoa/portalUi"), safeUi);
+                } catch (_) {}
+            }
+        };
+    </script>
+</body>
+</html>
