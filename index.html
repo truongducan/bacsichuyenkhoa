@@ -41,7 +41,6 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Định dạng nội dung bài đọc chi tiết */
         .reader-body-prose {
             font-family: 'Inter', sans-serif;
             font-size: 16px;
@@ -120,10 +119,15 @@
             </div>
 
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <span id="autoSaveText" data-admin-only class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    Đã lưu
+                <span id="autoSaveText" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold" title="Trạng thái đồng bộ dữ liệu trực tuyến">
+                    <span id="syncStatusDot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span id="syncStatusLabel">Đang kết nối...</span>
                 </span>
+
+                <button type="button" data-admin-only onclick="forcePullCloudData(true)" class="hidden sm:inline-flex px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-xs font-semibold items-center gap-1 transition-colors" title="Tải dữ liệu mới nhất từ máy chủ đồng bộ">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span class="hidden lg:inline">Tải lại dữ liệu</span>
+                </button>
 
                 <button type="button" data-admin-only onclick="openThemeDrawer()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors">
                     <i data-lucide="palette" class="w-3.5 h-3.5 text-brand-primary"></i>
@@ -241,7 +245,6 @@
     <!-- 4. TRANG ĐỌC 1 BÀI CHI TIẾT TRONG TRANG TIN (CANH ĐỀU + TÙY CHỈNH)  -->
     <!-- ===================================================================== -->
     <section id="articleReaderView" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <!-- Thanh điều hướng & thao tác bài -->
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 pb-4 mb-5 border-b border-slate-200">
             <div class="flex items-center gap-2 flex-wrap">
                 <button type="button" onclick="goHome()" class="font-bold text-brand-primary hover:underline flex items-center gap-1">
@@ -277,7 +280,6 @@
             </div>
         </div>
 
-        <!-- Thanh thiết lập Căn lề, Font, Cỡ chữ, Màu chữ riêng cho bài đang đọc -->
         <div id="readerFormatBar" data-admin-only class="hidden mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs space-y-3">
             <div class="flex items-center justify-between gap-2">
                 <span class="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
@@ -290,7 +292,6 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
-                <!-- Căn lề -->
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600 mb-1">Căn lề đoạn văn</label>
                     <div class="grid grid-cols-4 gap-1 bg-white p-1 rounded-xl border border-slate-200">
@@ -309,7 +310,6 @@
                     </div>
                 </div>
 
-                <!-- Font chữ -->
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600 mb-1">Font chữ nội dung</label>
                     <select id="readerFontSelect" onchange="updateCurrentArticleStyle({ fontFamily: this.value })" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-brand-primary">
@@ -320,7 +320,6 @@
                     </select>
                 </div>
 
-                <!-- Size chữ -->
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600 mb-1">Cỡ chữ (Size)</label>
                     <select id="readerSizeSelect" onchange="updateCurrentArticleStyle({ fontSize: Number(this.value) })" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-brand-primary">
@@ -331,7 +330,6 @@
                     </select>
                 </div>
 
-                <!-- Màu sắc chữ -->
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600 mb-1">Màu sắc chữ nội dung</label>
                     <div class="flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-slate-200">
@@ -345,7 +343,6 @@
             </div>
         </div>
 
-        <!-- Khung đọc 1 bài chi tiết trang nhã, cân đối -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <article class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-8 shadow-2xs space-y-5">
                 <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
@@ -361,7 +358,6 @@
 
                 <div id="readerMediaBox" class="hidden rounded-xl overflow-hidden border border-slate-200 bg-slate-950 relative"></div>
 
-                <!-- Phần nội dung chính áp dụng căn lề, font, size, màu chữ riêng của bài -->
                 <div id="readerSectionsBox" class="reader-body-prose"></div>
 
                 <div id="readerLinkBox" class="hidden pt-2"></div>
@@ -505,7 +501,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Ảnh bìa thẻ (tải ảnh hoặc dán URL)</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Ảnh bìa thẻ (tự nén khi tải ảnh hoặc dán URL)</label>
                     <div class="flex items-center gap-2">
                         <input type="text" id="cardCoverUrlInput" placeholder="https://..." class="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
                         <label class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold cursor-pointer shrink-0">
@@ -522,7 +518,7 @@
         </div>
     </div>
 
-    <!-- MODAL ĐĂNG / SỬA BÀI VIẾT (CÓ ĐỊNH DẠNG CĂN LỀ, FONT, SIZE, MÀU CHỮ) -->
+    <!-- MODAL ĐĂNG / SỬA BÀI VIẾT -->
     <div id="articleEditorModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -559,7 +555,6 @@
                     <textarea id="articleSapoInput" rows="2" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs outline-none"></textarea>
                 </div>
 
-                <!-- Thiết lập Căn lề, Font, Size, Màu chữ cho nội dung bài -->
                 <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
                     <span class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-700">Định dạng chữ nội dung bài</span>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -618,7 +613,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Ảnh minh họa</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ảnh minh họa (tự nén để đồng bộ nhanh)</label>
                         <div class="flex items-center gap-1.5">
                             <input type="text" id="articleImageInput" placeholder="URL ảnh hoặc tải ảnh..." class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none">
                             <label class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold cursor-pointer shrink-0">
@@ -628,7 +623,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">File PDF / Video đính kèm</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">File PDF / Tài liệu đính kèm</label>
                         <div class="flex items-center gap-1.5">
                             <input type="text" id="articleFileNameInput" placeholder="Tên file hoặc chọn file..." class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none">
                             <label class="px-2.5 py-2 bg-brand-primary text-white rounded-xl text-xs font-bold cursor-pointer shrink-0">
@@ -636,12 +631,13 @@
                                 <input type="file" onchange="handleArticleFileSelect(event)" class="hidden">
                             </label>
                         </div>
+                        <p id="articleFileSizeHint" class="text-[10px] text-slate-500 mt-1">Nên dùng link URL hoặc file nhỏ để đồng bộ mượt trên mọi máy.</p>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                     <button type="button" onclick="closeArticleEditorModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Hủy</button>
-                    <button type="submit" class="px-5 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl">Lưu &amp; Đăng bài</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl">Lưu &amp; Đồng bộ</button>
                 </div>
             </form>
         </div>
@@ -664,7 +660,7 @@
                     <h4 class="text-xs font-extrabold uppercase tracking-wider text-emerald-900">1. Hình Banner Lớn Trên Cùng</h4>
                     <button type="button" onclick="document.getElementById('cfgTopBannerImg').value=''; saveAndApplyUiConfig();" class="text-[11px] font-bold text-rose-600 hover:underline">Xóa ảnh</button>
                 </div>
-                <p class="text-[11px] text-slate-600">Tải ảnh banner ngang từ máy tính hoặc dán link ảnh để hiển thị ở dải trên cùng.</p>
+                <p class="text-[11px] text-slate-600">Tải ảnh banner ngang từ máy tính (tự động nén) hoặc dán link ảnh để hiển thị ở dải trên cùng.</p>
                 <div class="flex items-center gap-2">
                     <input type="text" id="cfgTopBannerImg" oninput="saveAndApplyUiConfig()" placeholder="Dán link ảnh banner hoặc bấm Tải ảnh..." class="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none">
                     <label class="px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl cursor-pointer shrink-0">
@@ -798,8 +794,8 @@
             imageUrl: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1000&q=80',
             linkLabel: 'Xem văn bản Thông tư 13/2025/TT-BYT',
             linkUrl: 'https://bschuyenkhoa.netlify.app/assets/documents/thong-tu-13-2025-tt-byt-huong-dan-trien-khai-ho-so-benh-an-dien-tu.pdf',
-            fileName: 'Thong_tu_13_2025_TT_BYT_Ho_so_benh_an_dien_tu.pdf',
-            fileDataUrl: 'https://bschuyenkhoa.netlify.app/assets/documents/thong-tu-13-2025-tt-byt-huong-dan-trien-khai-ho-so-benh-an_dien_tu.pdf',
+            fileName: 'Thong_tu_13_2025_TT_BYT_Ho_so_benh-an_dien_tu.pdf',
+            fileDataUrl: 'https://bschuyenkhoa.netlify.app/assets/documents/thong-tu-13-2025-tt-byt-huong-dan-trien-khai-ho-so-benh-an-dien-tu.pdf',
             fileMime: 'application/pdf',
             style: { ...DEFAULT_ARTICLE_STYLE }
         };
@@ -943,6 +939,31 @@
         let activeCategory = 'all';
         let currentCardContextId = null;
         let currentArticleContextId = null;
+        let lastUpdatedAt = Number(localStorage.getItem('bluehub_last_updated_at') || 0);
+
+        function setSyncBadge(state, text) {
+            const dot = document.getElementById('syncStatusDot');
+            const label = document.getElementById('syncStatusLabel');
+            const box = document.getElementById('autoSaveText');
+            if (!dot || !label || !box) return;
+
+            label.innerText = text;
+            if (state === 'syncing') {
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse';
+                box.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold';
+            } else if (state === 'error') {
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-rose-500';
+                box.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[11px] font-semibold';
+            } else {
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+                box.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold';
+            }
+        }
+
+        function formatTimeHHMM(ts) {
+            const d = ts ? new Date(ts) : new Date();
+            return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
 
         function normalizeArticleStyle(style) {
             return { ...DEFAULT_ARTICLE_STYLE, ...(style && typeof style === 'object' ? style : {}) };
@@ -957,7 +978,6 @@
             box.style.color = st.textColor;
             box.style.textAlign = st.align;
 
-            // Đồng bộ các điều khiển trên thanh định dạng
             const fontSel = document.getElementById('readerFontSelect');
             const sizeSel = document.getElementById('readerSizeSelect');
             const colorPicker = document.getElementById('readerColorPicker');
@@ -1176,30 +1196,84 @@
             } catch (_) {}
         }
 
-        async function saveCardsAuto() {
-            const el = document.getElementById('autoSaveText');
-            if (el) el.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Đang lưu...';
-
-            await idbPut(DB_KEY_CARDS, communityCards);
+        function saveLocalCacheOnly() {
+            lastUpdatedAt = Date.now();
+            localStorage.setItem('bluehub_last_updated_at', String(lastUpdatedAt));
+            idbPut(DB_KEY_CARDS, communityCards);
             try {
                 localStorage.setItem('bluehub_cards_v2', JSON.stringify(communityCards));
             } catch (_) {}
+        }
+
+        async function saveCardsAuto() {
+            setSyncBadge('syncing', 'Đang đồng bộ...');
+            saveLocalCacheOnly();
 
             if (typeof window.syncCardsToCloud === 'function') {
-                await window.syncCardsToCloud();
+                const res = await window.syncCardsToCloud();
+                if (res && res.ok) {
+                    setSyncBadge('ok', `Đã đồng bộ ${formatTimeHHMM(res.updatedAt || lastUpdatedAt)}`);
+                    return;
+                }
+                if (res && res.reason === 'too_large') {
+                    setSyncBadge('error', 'Dữ liệu/file quá lớn');
+                    showToast('Đã lưu trên máy, nhưng file/ảnh quá lớn để đồng bộ hết lên máy chủ. Hãy dùng link URL hoặc file nhỏ hơn.');
+                    return;
+                }
+                setSyncBadge('error', 'Lỗi đồng bộ');
+                showToast('Đã lưu trên máy nhưng chưa đồng bộ được lên máy chủ. Kiểm tra kết nối hoặc quyền Firebase.');
+                return;
             }
 
-            const now = new Date();
-            const t = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            if (el) el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đã lưu ${t}`;
+            setSyncBadge('ok', `Đã lưu máy ${formatTimeHHMM(lastUpdatedAt)}`);
         }
 
         async function persistUiConfig() {
             localStorage.setItem('bluehub_ui_v2', JSON.stringify(uiConfig));
             await idbPut(DB_KEY_UI, uiConfig);
             if (typeof window.syncUiConfigToCloud === 'function') {
-                await window.syncUiConfigToCloud();
+                const res = await window.syncUiConfigToCloud();
+                if (res && res.ok) {
+                    setSyncBadge('ok', `Đã đồng bộ ${formatTimeHHMM(res.updatedAt || Date.now())}`);
+                } else {
+                    setSyncBadge('error', 'Lỗi đồng bộ giao diện');
+                }
             }
+        }
+
+        // Nén ảnh phía trình duyệt để giữ ảnh rõ nét và gọn nhẹ khi đồng bộ
+        function compressImageFile(file, maxWidth = 1280, quality = 0.78) {
+            return new Promise((resolve, reject) => {
+                if (!file || !file.type || !file.type.startsWith('image/')) {
+                    return reject(new Error('Không phải tệp ảnh'));
+                }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxWidth) {
+                            h = Math.round((h * maxWidth) / w);
+                            w = maxWidth;
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        // Dùng JPEG cho ảnh chụp để giảm dung lượng tốt, giữ PNG nếu ảnh nhỏ có độ trong suốt
+                        const outMime = file.type === 'image/png' && file.size < 450 * 1024 ? 'image/png' : 'image/jpeg';
+                        const dataUrl = canvas.toDataURL(outMime, quality);
+                        resolve(dataUrl);
+                    };
+                    img.onerror = reject;
+                    img.src = ev.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
         }
 
         window.onload = async () => {
@@ -1221,6 +1295,10 @@
             applyUiConfig(uiConfig);
             renderPortalHome();
             lucide.createIcons();
+
+            if (typeof window.forcePullCloudData === 'function') {
+                await window.forcePullCloudData(false);
+            }
         };
 
         function escapeHtml(str) {
@@ -1605,13 +1683,13 @@
             }
 
             const attBox = document.getElementById('readerAttachmentBox');
-            if (art.fileDataUrl || art.fileName) {
+            if (art.fileDataUrl || art.fileName || sanitizeHttpUrl(art.linkUrl)) {
                 attBox.classList.remove('hidden');
                 attBox.innerHTML = `
                     <div class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
                         <div class="min-w-0">
                             <p class="text-[11px] font-bold uppercase text-slate-500">Tài liệu đính kèm</p>
-                            <p class="text-sm font-bold text-slate-900 truncate">${escapeHtml(art.fileName || 'Tài liệu')}</p>
+                            <p class="text-sm font-bold text-slate-900 truncate">${escapeHtml(art.fileName || art.title || 'Tài liệu')}</p>
                         </div>
                         <button type="button" onclick="openAttachmentViewer(${art.id})" class="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shrink-0">
                             Xem tài liệu
@@ -1702,7 +1780,7 @@
             if (currentCardContextId === editId && currentArticleContextId) {
                 openArticleReader(currentCardContextId, currentArticleContextId);
             }
-            showToast('Đã lưu thẻ chức năng thành công!');
+            showToast('Đã lưu và đồng bộ thẻ chức năng!');
         }
 
         async function deleteCardById(cardId) {
@@ -1712,7 +1790,7 @@
             await saveCardsAuto();
             renderPortalHome();
             if (currentCardContextId === cardId) goHome();
-            showToast('Đã xóa thẻ!');
+            showToast('Đã xóa thẻ và cập nhật đồng bộ!');
         }
 
         function openArticleEditorModal(presetCardId = null) {
@@ -1727,6 +1805,7 @@
             document.getElementById('articleFontInput').value = DEFAULT_ARTICLE_STYLE.fontFamily;
             document.getElementById('articleSizeInput').value = String(DEFAULT_ARTICLE_STYLE.fontSize);
             document.getElementById('articleColorInput').value = DEFAULT_ARTICLE_STYLE.textColor;
+            document.getElementById('articleFileSizeHint').innerText = 'Nên dùng link URL hoặc file nhỏ để đồng bộ mượt trên mọi máy.';
             if (presetCardId) sel.value = presetCardId;
             document.getElementById('articleModalHeading').innerText = 'Đăng trang tin mới';
             document.getElementById('articleEditorModal').classList.remove('hidden');
@@ -1779,31 +1858,58 @@
             } else {
                 goHome();
             }
-            showToast('Đã xóa bài viết!');
+            showToast('Đã xóa bài viết và đồng bộ!');
         }
 
         function closeArticleEditorModal() {
             document.getElementById('articleEditorModal').classList.add('hidden');
         }
 
-        function handleImageUpload(event, inputId, cb) {
+        async function handleImageUpload(event, inputId, cb) {
             if (!isAdminMode) return openAdminPassModal();
             const file = event.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById(inputId).value = e.target.result;
+            try {
+                showToast('Đang nén ảnh để tối ưu đồng bộ...');
+                const compressedUrl = await compressImageFile(file, 1200, 0.76);
+                document.getElementById(inputId).value = compressedUrl;
                 if (typeof cb === 'function') cb();
-            };
-            reader.readAsDataURL(file);
+                showToast('Đã tải và nén ảnh thành công!');
+            } catch (_) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById(inputId).value = e.target.result;
+                    if (typeof cb === 'function') cb();
+                };
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
         }
 
         function handleArticleFileSelect(event) {
             if (!isAdminMode) return openAdminPassModal();
             const file = event.target.files[0];
             if (!file) return;
+            const hint = document.getElementById('articleFileSizeHint');
+            const sizeKb = Math.round(file.size / 1024);
             document.getElementById('articleFileNameInput').value = file.name;
             document.getElementById('articleFileMime').value = file.type || 'application/octet-stream';
+
+            if (file.size > 900 * 1024) {
+                document.getElementById('articleFileDataUrl').value = '';
+                if (hint) {
+                    hint.className = 'text-[10px] text-amber-700 font-semibold mt-1';
+                    hint.innerText = `File ${sizeKb} KB hơi lớn để nhúng trực tiếp. Hãy dán link URL file vào ô "Đường link" để các máy khác mở được.`;
+                }
+                showToast('File > 900 KB: hãy dùng Đường link URL để đồng bộ trên các máy khác.');
+                return;
+            }
+
+            if (hint) {
+                hint.className = 'text-[10px] text-emerald-700 font-semibold mt-1';
+                hint.innerText = `Đã chọn file (${sizeKb} KB) — sẵn sàng đồng bộ.`;
+            }
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 document.getElementById('articleFileDataUrl').value = e.target.result;
@@ -1861,7 +1967,7 @@
             closeArticleEditorModal();
             renderPortalHome();
             openArticleReader(card.id, payload.id);
-            showToast('Đã lưu và cập nhật bài viết!');
+            showToast('Đã lưu và đồng bộ bài viết cho các máy khác!');
         }
 
         async function openAttachmentViewer(articleId) {
@@ -1871,7 +1977,7 @@
                 const url = art.fileDataUrl || sanitizeHttpUrl(art.linkUrl);
                 const name = art.fileName || art.title || 'Tài liệu';
                 if (!url) {
-                    showToast('Chưa có file hoặc đường link để xem.');
+                    showToast('Chưa có file hoặc đường link hợp lệ để xem.');
                     return;
                 }
                 document.getElementById('viewerFileTitle').innerText = name;
@@ -1911,7 +2017,7 @@
 
         function exportBackupJson() {
             if (!isAdminMode) return openAdminPassModal();
-            const payload = { uiConfig, communityCards };
+            const payload = { uiConfig, communityCards, updatedAt: Date.now() };
             const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
@@ -1938,7 +2044,7 @@
                         await persistUiConfig();
                     }
                     goHome();
-                    showToast('Đã khôi phục dữ liệu từ file JSON!');
+                    showToast('Đã khôi phục và đồng bộ dữ liệu từ file JSON!');
                 } catch (_) {
                     showToast('File JSON không hợp lệ.');
                 }
@@ -1949,24 +2055,24 @@
 
         async function resetDemoData() {
             if (!isAdminMode) return openAdminPassModal();
-            if (!confirm('Khôi phục dữ liệu thẻ mẫu ban đầu?')) return;
+            if (!confirm('Khôi phục dữ liệu thẻ mẫu ban đầu và đồng bộ lên máy chủ?')) return;
             communityCards = JSON.parse(JSON.stringify(defaultCards));
             await saveCardsAuto();
             goHome();
-            showToast('Đã khôi phục dữ liệu mẫu!');
+            showToast('Đã khôi phục và đồng bộ dữ liệu mẫu!');
         }
 
         function showToast(msg) {
             const t = document.getElementById('toast');
             document.getElementById('toastText').innerText = msg;
             t.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 2600);
+            setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 2800);
         }
     </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC0hsg73wu51yOqGgHfByDfD4NuMtOfFGA",
@@ -1981,65 +2087,180 @@
 
         let firebaseDb = null;
         let isApplyingRemote = false;
+        const MAX_CLOUD_BYTES = 7 * 1024 * 1024; // Giới hạn an toàn ~7MB cho 1 lần ghi RTDB
+
+        function sanitizeCardsForCloud(cards) {
+            return (cards || []).map(card => ({
+                ...card,
+                coverImage: card.coverImage || "",
+                items: (card.items || []).map(item => ({
+                    ...item,
+                    imageUrl: item.imageUrl || "",
+                    fileDataUrl: item.fileDataUrl && item.fileDataUrl.length < 1.2 * 1024 * 1024 ? item.fileDataUrl : ""
+                }))
+            }));
+        }
+
+        function applyRemoteCardsPayload(rawVal) {
+            if (!rawVal) return false;
+            const list = Array.isArray(rawVal) ? rawVal : (Array.isArray(rawVal.cards) ? rawVal.cards : null);
+            if (!Array.isArray(list) || list.length === 0) return false;
+
+            const remoteTs = Number(rawVal && rawVal.updatedAt ? rawVal.updatedAt : 0);
+            isApplyingRemote = true;
+            communityCards = list;
+            if (remoteTs > 0) {
+                lastUpdatedAt = remoteTs;
+                localStorage.setItem('bluehub_last_updated_at', String(remoteTs));
+            }
+            idbPut(DB_KEY_CARDS, communityCards);
+            try {
+                localStorage.setItem('bluehub_cards_v2', JSON.stringify(communityCards));
+            } catch (_) {}
+
+            renderPortalHome();
+            if (currentCardContextId && currentArticleContextId) {
+                const stillExists = communityCards
+                    .find(c => c.id === currentCardContextId)?.items
+                    ?.some(i => i.id === currentArticleContextId);
+                if (stillExists) {
+                    openArticleReader(currentCardContextId, currentArticleContextId);
+                }
+            }
+            isApplyingRemote = false;
+            setSyncBadge('ok', `Đã đồng bộ ${formatTimeHHMM(remoteTs || Date.now())}`);
+            return true;
+        }
 
         try {
             const app = initializeApp(firebaseConfig);
             firebaseDb = getDatabase(app);
 
-            onValue(ref(firebaseDb, "bschuyenkhoa/portalCards"), (snapshot) => {
-                const remoteCards = snapshot.val();
-                if (Array.isArray(remoteCards) && remoteCards.length > 0) {
-                    isApplyingRemote = true;
-                    communityCards = remoteCards;
-                    renderPortalHome();
-                    if (currentCardContextId && currentArticleContextId) {
-                        openArticleReader(currentCardContextId, currentArticleContextId);
-                    }
-                    isApplyingRemote = false;
+            window.forcePullCloudData = async function (showFeedback = false) {
+                if (!firebaseDb) {
+                    setSyncBadge('error', 'Chưa kết nối máy chủ');
+                    return false;
                 }
-            });
+                try {
+                    if (showFeedback) setSyncBadge('syncing', 'Đang tải dữ liệu...');
+                    const snap = await get(ref(firebaseDb, "bschuyenkhoa/portalState"));
+                    if (snap.exists()) {
+                        const data = snap.val();
+                        if (data.ui && typeof data.ui === "object") {
+                            isApplyingRemote = true;
+                            uiConfig = { ...defaultUiConfig, ...data.ui };
+                            localStorage.setItem("bluehub_ui_v2", JSON.stringify(uiConfig));
+                            idbPut(DB_KEY_UI, uiConfig);
+                            applyUiConfig(uiConfig);
+                            isApplyingRemote = false;
+                        }
+                        if (applyRemoteCardsPayload(data)) {
+                            if (showFeedback) showToast('Đã cập nhật dữ liệu mới nhất từ máy chủ!');
+                            return true;
+                        }
+                    }
 
-            onValue(ref(firebaseDb, "bschuyenkhoa/portalUi"), (snapshot) => {
-                const remoteUi = snapshot.val();
-                if (remoteUi && typeof remoteUi === "object") {
+                    // Tương thích ngược nếu dữ liệu cũ nằm ở portalCards / portalUi
+                    const legacyCardsSnap = await get(ref(firebaseDb, "bschuyenkhoa/portalCards"));
+                    if (legacyCardsSnap.exists()) {
+                        applyRemoteCardsPayload(legacyCardsSnap.val());
+                    }
+                    const legacyUiSnap = await get(ref(firebaseDb, "bschuyenkhoa/portalUi"));
+                    if (legacyUiSnap.exists() && typeof legacyUiSnap.val() === "object") {
+                        isApplyingRemote = true;
+                        uiConfig = { ...defaultUiConfig, ...uiConfig, ...legacyUiSnap.val() };
+                        localStorage.setItem("bluehub_ui_v2", JSON.stringify(uiConfig));
+                        applyUiConfig(uiConfig);
+                        isApplyingRemote = false;
+                    }
+                    setSyncBadge('ok', `Đã kết nối ${formatTimeHHMM(Date.now())}`);
+                    if (showFeedback) showToast('Đã kiểm tra dữ liệu máy chủ.');
+                    return true;
+                } catch (err) {
+                    console.warn("Pull cloud error:", err);
+                    setSyncBadge('error', 'Không tải được dữ liệu');
+                    if (showFeedback) showToast('Không thể tải dữ liệu từ máy chủ. Kiểm tra kết nối hoặc quyền Firebase.');
+                    return false;
+                }
+            };
+
+            onValue(ref(firebaseDb, "bschuyenkhoa/portalState"), (snapshot) => {
+                if (!snapshot.exists() || isApplyingRemote) return;
+                const val = snapshot.val();
+                if (val.ui && typeof val.ui === "object") {
                     isApplyingRemote = true;
-                    uiConfig = { ...defaultUiConfig, ...uiConfig, ...remoteUi };
+                    uiConfig = { ...defaultUiConfig, ...val.ui };
                     localStorage.setItem("bluehub_ui_v2", JSON.stringify(uiConfig));
+                    idbPut(DB_KEY_UI, uiConfig);
                     applyUiConfig(uiConfig);
                     isApplyingRemote = false;
                 }
+                applyRemoteCardsPayload(val);
+            }, (err) => {
+                console.warn("onValue error:", err);
+                setSyncBadge('error', 'Lỗi đồng bộ thời gian thực');
+            });
+
+            onValue(ref(firebaseDb, "bschuyenkhoa/portalCards"), (snapshot) => {
+                if (!snapshot.exists() || isApplyingRemote) return;
+                applyRemoteCardsPayload(snapshot.val());
             });
         } catch (err) {
             console.warn("Firebase init:", err);
+            setSyncBadge('error', 'Lỗi khởi tạo đồng bộ');
         }
 
         window.syncCardsToCloud = async function () {
-            if (firebaseDb && !isApplyingRemote) {
-                try {
-                    const lightweight = (communityCards || []).map(card => ({
-                        ...card,
-                        coverImage: card.coverImage && card.coverImage.length > 800 * 1024 ? "" : card.coverImage,
-                        items: (card.items || []).map(item => ({
-                            ...item,
-                            imageUrl: item.imageUrl && item.imageUrl.length > 800 * 1024 ? "" : item.imageUrl,
-                            fileDataUrl: item.fileDataUrl && item.fileDataUrl.length > 800 * 1024 ? "" : item.fileDataUrl
-                        }))
-                    }));
-                    await set(ref(firebaseDb, "bschuyenkhoa/portalCards"), lightweight);
-                } catch (_) {}
+            if (!firebaseDb) return { ok: false, reason: 'no_db' };
+            if (isApplyingRemote) return { ok: true, updatedAt: Date.now() };
+
+            try {
+                const nowTs = Date.now();
+                const cloudCards = sanitizeCardsForCloud(communityCards);
+                const payload = {
+                    cards: cloudCards,
+                    ui: uiConfig,
+                    updatedAt: nowTs
+                };
+                const approxBytes = new Blob([JSON.stringify(payload)]).size;
+                if (approxBytes > MAX_CLOUD_BYTES) {
+                    return { ok: false, reason: 'too_large' };
+                }
+
+                await set(ref(firebaseDb, "bschuyenkhoa/portalState"), payload);
+                await set(ref(firebaseDb, "bschuyenkhoa/portalCards"), cloudCards);
+                lastUpdatedAt = nowTs;
+                localStorage.setItem('bluehub_last_updated_at', String(nowTs));
+                return { ok: true, updatedAt: nowTs };
+            } catch (err) {
+                console.warn("syncCardsToCloud error:", err);
+                return { ok: false, reason: 'write_failed' };
             }
         };
 
         window.syncUiConfigToCloud = async function () {
-            if (firebaseDb && !isApplyingRemote) {
-                try {
-                    const safeUi = {
-                        ...uiConfig,
-                        topBannerImg: uiConfig.topBannerImg && uiConfig.topBannerImg.length > 800 * 1024 ? "" : uiConfig.topBannerImg,
-                        logoImgUrl: uiConfig.logoImgUrl && uiConfig.logoImgUrl.length > 800 * 1024 ? "" : uiConfig.logoImgUrl
-                    };
-                    await set(ref(firebaseDb, "bschuyenkhoa/portalUi"), safeUi);
-                } catch (_) {}
+            if (!firebaseDb) return { ok: false, reason: 'no_db' };
+            if (isApplyingRemote) return { ok: true, updatedAt: Date.now() };
+
+            try {
+                const nowTs = Date.now();
+                const cloudCards = sanitizeCardsForCloud(communityCards);
+                const payload = {
+                    cards: cloudCards,
+                    ui: uiConfig,
+                    updatedAt: nowTs
+                };
+                const approxBytes = new Blob([JSON.stringify(payload)]).size;
+                if (approxBytes > MAX_CLOUD_BYTES) {
+                    return { ok: false, reason: 'too_large' };
+                }
+
+                await set(ref(firebaseDb, "bschuyenkhoa/portalState"), payload);
+                await set(ref(firebaseDb, "bschuyenkhoa/portalUi"), uiConfig);
+                return { ok: true, updatedAt: nowTs };
+            } catch (err) {
+                console.warn("syncUiConfigToCloud error:", err);
+                return { ok: false, reason: 'write_failed' };
             }
         };
     </script>
